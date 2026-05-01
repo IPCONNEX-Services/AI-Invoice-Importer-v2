@@ -15,7 +15,7 @@
  "module": "Ai Importer",
  "name": "AI Importer",
  "onboarding": "",
- "parent_page": "",
+ "parent_page": "Accounting",
  "public": 1,
  "roles": [{"role": "System Manager"}],
  "sequence_id": 99,
