@@ -13,6 +13,7 @@ def run_extraction(import_name):
     doc = frappe.get_doc("AI Invoice Import", import_name)
     settings = frappe.get_single("AI Import Settings")
     success = 0
+    tokens_used = 0
 
     try:
         doc.status = "Extracting"
@@ -40,7 +41,7 @@ def run_extraction(import_name):
             api_key=api_key,
         )
 
-        result = extract_invoice_data(text, provider=provider, model=model, api_key=api_key)
+        result, tokens_used = extract_invoice_data(text, provider=provider, model=model, api_key=api_key)
 
         doc.raw_ai_response = json.dumps(result, indent=2)
         doc.ai_confidence = int((result.get("confidence_score") or 0) * 100)
@@ -98,6 +99,7 @@ def run_extraction(import_name):
                 "provider": doc.provider_used or "",
                 "model": doc.model_used or "",
                 "extraction_method": doc.extraction_method or "",
+                "tokens_used": tokens_used,
                 "success": success,
                 "error": doc.error_message or "",
             }).insert(ignore_permissions=True)

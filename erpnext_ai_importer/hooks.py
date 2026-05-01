@@ -11,3 +11,8 @@ required_apps = ["frappe", "erpnext"]
 doctype_js = {
     "AI Invoice Import": "public/js/ai_invoice_import.js"
 }
+
+fixtures = [
+    {"doctype": "Workspace", "filters": [["module", "=", "Ai Importer"]]},
+    {"doctype": "Page", "filters": [["module", "=", "Ai Importer"]]},
+]

@@ -4,13 +4,14 @@
  "docstatus": 0,
  "doctype": "Page",
  "idx": 0,
- "module": "AI Importer",
+ "module": "Ai Importer",
  "name": "ai-invoice-importer",
  "page_name": "ai-invoice-importer",
- "roles": [],
+ "roles": [{"role": "System Manager"}],
  "script": null,
  "standard": "Yes",
  "style": null,
  "system_page": 0,
+
  "title": "Supplier Invoice Importer"
 }

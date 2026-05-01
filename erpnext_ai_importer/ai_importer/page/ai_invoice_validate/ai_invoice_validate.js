@@ -73,7 +73,7 @@ class AiValidatePage {
 		const conf_label = supplier_score >= auto_accept ? `✓ matched (${supplier_score}%)` : supplier_score >= low_threshold ? `⚠ low confidence (${supplier_score}%)` : `✕ very low (${supplier_score}%)`;
 
 		const ai_conf = d.ai_confidence ? `${Math.round(d.ai_confidence)}%` : "—";
-		const ai_conf_color = d.ai_confidence >= 0.8 ? "#16a34a" : d.ai_confidence >= 0.5 ? "#d97706" : "#dc2626";
+		const ai_conf_color = d.ai_confidence >= 80 ? "#16a34a" : d.ai_confidence >= 50 ? "#d97706" : "#dc2626";
 
 		const items_html = (d.items || []).map((item) => this._item_row_html(item, item_threshold)).join("");
 

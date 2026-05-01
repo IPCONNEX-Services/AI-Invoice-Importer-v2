@@ -42,7 +42,7 @@ def _parse_json(raw):
 
 
 def extract_invoice_data(text, provider, model, api_key):
-    """Call AI provider and return parsed dict."""
+    """Call AI provider and return (parsed_dict, tokens_used)."""
     prompt = _build_prompt(text)
     if provider == "Claude":
         return _call_claude(prompt, model, api_key)
@@ -64,7 +64,8 @@ def _call_claude(prompt, model, api_key):
             max_tokens=MAX_TOKENS,
             messages=[{"role": "user", "content": prompt}],
         )
-        return _parse_json(msg.content[0].text)
+        tokens = (msg.usage.input_tokens or 0) + (msg.usage.output_tokens or 0)
+        return _parse_json(msg.content[0].text), tokens
     except anthropic.APIError as e:
         import frappe
         frappe.throw(f"Claude API error: {e}")
@@ -79,7 +80,8 @@ def _call_openai(prompt, model, api_key):
             messages=[{"role": "user", "content": prompt}],
             max_tokens=MAX_TOKENS,
         )
-        return _parse_json(resp.choices[0].message.content)
+        tokens = resp.usage.total_tokens if resp.usage else 0
+        return _parse_json(resp.choices[0].message.content), tokens
     except OpenAIError as e:
         import frappe
         frappe.throw(f"OpenAI API error: {e}")
@@ -91,7 +93,8 @@ def _call_gemini(prompt, model, api_key):
         genai.configure(api_key=api_key)
         m = genai.GenerativeModel(model)
         resp = m.generate_content(prompt)
-        return _parse_json(resp.text)
+        tokens = getattr(getattr(resp, "usage_metadata", None), "total_token_count", 0) or 0
+        return _parse_json(resp.text), tokens
     except Exception as e:
         import frappe
         frappe.throw(f"Gemini API error: {e}")
