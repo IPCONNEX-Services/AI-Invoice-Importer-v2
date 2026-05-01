@@ -1,0 +1,27 @@
+{
+ "actions": [],
+ "creation": "2026-04-18 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["import_record", "timestamp", "provider", "model", "extraction_method", "tokens_used", "success", "error"],
+ "fields": [
+  {"fieldname": "import_record", "fieldtype": "Link", "label": "Import Record", "options": "AI Invoice Import", "in_list_view": 1},
+  {"fieldname": "timestamp", "fieldtype": "Datetime", "label": "Timestamp", "in_list_view": 1},
+  {"fieldname": "provider", "fieldtype": "Data", "label": "Provider", "in_list_view": 1},
+  {"fieldname": "model", "fieldtype": "Data", "label": "Model"},
+  {"fieldname": "extraction_method", "fieldtype": "Data", "label": "Extraction Method"},
+  {"fieldname": "tokens_used", "fieldtype": "Int", "label": "Tokens Used"},
+  {"fieldname": "success", "fieldtype": "Check", "label": "Success", "in_list_view": 1},
+  {"fieldname": "error", "fieldtype": "Text", "label": "Error"}
+ ],
+ "modified": "2026-04-18 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Ai Importer",
+ "name": "AI Import Log",
+ "owner": "Administrator",
+ "permissions": [
+  {"read": 1, "report": 1, "role": "System Manager"}
+ ],
+ "sort_field": "timestamp",
+ "sort_order": "DESC"
+}

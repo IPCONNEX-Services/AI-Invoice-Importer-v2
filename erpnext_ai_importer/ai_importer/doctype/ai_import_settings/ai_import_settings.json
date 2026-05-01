@@ -1,0 +1,180 @@
+{
+ "actions": [],
+ "creation": "2026-04-18 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "ai_provider_section",
+  "default_provider",
+  "claude_section",
+  "claude_api_key",
+  "claude_model",
+  "openai_section",
+  "openai_api_key",
+  "openai_model",
+  "gemini_section",
+  "gemini_api_key",
+  "gemini_model",
+  "extraction_section",
+  "max_pages",
+  "scanned_mode",
+  "scanned_char_threshold",
+  "matching_section",
+  "supplier_auto_accept",
+  "supplier_low_confidence",
+  "item_match_threshold",
+  "tax_section",
+  "default_tax_template",
+  "duplicate_detection"
+ ],
+ "fields": [
+  {
+   "fieldname": "ai_provider_section",
+   "fieldtype": "Section Break",
+   "label": "AI Provider"
+  },
+  {
+   "fieldname": "default_provider",
+   "fieldtype": "Select",
+   "label": "Default Provider",
+   "options": "Claude\nOpenAI\nGemini",
+   "default": "Claude",
+   "reqd": 1
+  },
+  {
+   "fieldname": "claude_section",
+   "fieldtype": "Section Break",
+   "label": "Claude (Anthropic)"
+  },
+  {
+   "fieldname": "claude_api_key",
+   "fieldtype": "Password",
+   "label": "Claude API Key"
+  },
+  {
+   "fieldname": "claude_model",
+   "fieldtype": "Select",
+   "label": "Claude Model",
+   "options": "claude-haiku-4-5-20251001\nclaude-sonnet-4-6\nclaude-opus-4-7",
+   "default": "claude-haiku-4-5-20251001"
+  },
+  {
+   "fieldname": "openai_section",
+   "fieldtype": "Section Break",
+   "label": "OpenAI"
+  },
+  {
+   "fieldname": "openai_api_key",
+   "fieldtype": "Password",
+   "label": "OpenAI API Key"
+  },
+  {
+   "fieldname": "openai_model",
+   "fieldtype": "Select",
+   "label": "OpenAI Model",
+   "options": "gpt-4o-mini\ngpt-4o",
+   "default": "gpt-4o-mini"
+  },
+  {
+   "fieldname": "gemini_section",
+   "fieldtype": "Section Break",
+   "label": "Google Gemini"
+  },
+  {
+   "fieldname": "gemini_api_key",
+   "fieldtype": "Password",
+   "label": "Gemini API Key"
+  },
+  {
+   "fieldname": "gemini_model",
+   "fieldtype": "Select",
+   "label": "Gemini Model",
+   "options": "gemini-2.0-flash\ngemini-2.5-pro",
+   "default": "gemini-2.0-flash"
+  },
+  {
+   "fieldname": "extraction_section",
+   "fieldtype": "Section Break",
+   "label": "Extraction"
+  },
+  {
+   "fieldname": "max_pages",
+   "fieldtype": "Int",
+   "label": "Max Pages to Send to AI",
+   "default": "3",
+   "description": "Cap to reduce token cost"
+  },
+  {
+   "fieldname": "scanned_mode",
+   "fieldtype": "Select",
+   "label": "Scanned PDF Handling",
+   "options": "ai_vision\nocr\nskip",
+   "default": "skip"
+  },
+  {
+   "fieldname": "scanned_char_threshold",
+   "fieldtype": "Int",
+   "label": "Scanned Char Threshold",
+   "default": "200",
+   "description": "If extracted text is shorter than this, treat PDF as scanned"
+  },
+  {
+   "fieldname": "matching_section",
+   "fieldtype": "Section Break",
+   "label": "Fuzzy Matching"
+  },
+  {
+   "fieldname": "supplier_auto_accept",
+   "fieldtype": "Percent",
+   "label": "Supplier Auto-Accept Above (%)",
+   "default": "85"
+  },
+  {
+   "fieldname": "supplier_low_confidence",
+   "fieldtype": "Percent",
+   "label": "Supplier Low-Confidence Below (%)",
+   "default": "60"
+  },
+  {
+   "fieldname": "item_match_threshold",
+   "fieldtype": "Percent",
+   "label": "Item Match Threshold (%)",
+   "default": "70"
+  },
+  {
+   "fieldname": "tax_section",
+   "fieldtype": "Section Break",
+   "label": "Tax & Duplicates"
+  },
+  {
+   "fieldname": "default_tax_template",
+   "fieldtype": "Link",
+   "label": "Default Tax Template",
+   "options": "Purchase Taxes and Charges Template"
+  },
+  {
+   "fieldname": "duplicate_detection",
+   "fieldtype": "Select",
+   "label": "Duplicate Detection",
+   "options": "warn\nblock\ndisabled",
+   "default": "warn"
+  }
+ ],
+ "issingle": 1,
+ "modified": "2026-04-18 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Ai Importer",
+ "name": "AI Import Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

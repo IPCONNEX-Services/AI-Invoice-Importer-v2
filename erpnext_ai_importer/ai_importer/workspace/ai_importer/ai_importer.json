@@ -1,0 +1,61 @@
+{
+ "category": "Modules",
+ "charts": [],
+ "content": "[{\"id\": \"s1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Supplier Invoice Importer\", \"col\": 3}}, {\"id\": \"s2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"AI Invoice Import\", \"col\": 3}}, {\"id\": \"s3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"AI Import Settings\", \"col\": 3}}]",
+ "creation": "2026-04-18 00:00:00.000000",
+ "developer_mode_only": 0,
+ "disable_user_customization": 0,
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "upload",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "AI Importer",
+ "module": "AI Importer",
+ "name": "AI Importer",
+ "onboarding": "",
+ "parent_page": "",
+ "public": 1,
+ "roles": [],
+ "sequence_id": 99,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "",
+   "doctype": "Page",
+   "format": "",
+   "icon": "upload",
+   "label": "Supplier Invoice Importer",
+   "link_to": "ai-invoice-importer",
+   "name": "Supplier Invoice Importer",
+   "stats_filter": "",
+   "type": "Page"
+  },
+  {
+   "color": "Green",
+   "doc_view": "",
+   "doctype": "DocType",
+   "format": "",
+   "icon": "file",
+   "label": "AI Invoice Import",
+   "link_to": "AI Invoice Import",
+   "name": "AI Invoice Import",
+   "stats_filter": "",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "doctype": "DocType",
+   "format": "",
+   "icon": "settings",
+   "label": "AI Import Settings",
+   "link_to": "AI Import Settings",
+   "name": "AI Import Settings",
+   "stats_filter": "",
+   "type": "DocType"
+  }
+ ],
+ "title": "AI Importer"
+}

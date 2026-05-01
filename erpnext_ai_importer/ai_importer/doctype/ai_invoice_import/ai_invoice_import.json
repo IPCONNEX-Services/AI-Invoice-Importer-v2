@@ -1,0 +1,253 @@
+{
+ "actions": [],
+ "autoname": "AI-IMP-.YYYY.-.#####",
+ "creation": "2026-04-18 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "source_file",
+  "file_type",
+  "status",
+  "cb1",
+  "provider_used",
+  "model_used",
+  "extraction_method",
+  "ai_confidence",
+  "section_supplier",
+  "extracted_supplier_name",
+  "supplier",
+  "supplier_match_score",
+  "section_invoice",
+  "invoice_number",
+  "invoice_date",
+  "due_date",
+  "currency",
+  "section_amounts",
+  "subtotal",
+  "tax_amount",
+  "total",
+  "tax_template",
+  "section_items",
+  "items",
+  "section_result",
+  "purchase_invoice",
+  "section_debug",
+  "raw_ai_response",
+  "error_message"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "source_file",
+   "fieldtype": "Attach",
+   "label": "Source File"
+  },
+  {
+   "fieldname": "file_type",
+   "fieldtype": "Select",
+   "label": "File Type",
+   "options": "pdf\nexcel\ncsv",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nExtracting\nPending Validation\nSubmitted\nFailed",
+   "default": "Draft",
+   "in_list_view": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "provider_used",
+   "fieldtype": "Data",
+   "label": "Provider Used",
+   "read_only": 1
+  },
+  {
+   "fieldname": "model_used",
+   "fieldtype": "Data",
+   "label": "Model Used",
+   "read_only": 1
+  },
+  {
+   "fieldname": "extraction_method",
+   "fieldtype": "Data",
+   "label": "Extraction Method",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ai_confidence",
+   "fieldtype": "Percent",
+   "label": "AI Confidence",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "section_supplier",
+   "fieldtype": "Section Break",
+   "label": "Supplier"
+  },
+  {
+   "fieldname": "extracted_supplier_name",
+   "fieldtype": "Data",
+   "label": "Extracted Supplier Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier (Matched)",
+   "options": "Supplier",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "supplier_match_score",
+   "fieldtype": "Percent",
+   "label": "Supplier Match %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_invoice",
+   "fieldtype": "Section Break",
+   "label": "Invoice Details"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
+  },
+  {
+   "fieldname": "invoice_date",
+   "fieldtype": "Date",
+   "label": "Invoice Date"
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Due Date"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "section_amounts",
+   "fieldtype": "Section Break",
+   "label": "Amounts"
+  },
+  {
+   "fieldname": "subtotal",
+   "fieldtype": "Currency",
+   "label": "Subtotal"
+  },
+  {
+   "fieldname": "tax_amount",
+   "fieldtype": "Currency",
+   "label": "Tax Amount"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Currency",
+   "label": "Total",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tax_template",
+   "fieldtype": "Link",
+   "label": "Tax Template",
+   "options": "Purchase Taxes and Charges Template"
+  },
+  {
+   "fieldname": "section_items",
+   "fieldtype": "Section Break",
+   "label": "Line Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "AI Invoice Import Item"
+  },
+  {
+   "fieldname": "section_result",
+   "fieldtype": "Section Break",
+   "label": "Result"
+  },
+  {
+   "fieldname": "purchase_invoice",
+   "fieldtype": "Link",
+   "label": "Purchase Invoice Created",
+   "options": "Purchase Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_debug",
+   "fieldtype": "Section Break",
+   "label": "Debug",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "raw_ai_response",
+   "fieldtype": "Long Text",
+   "label": "Raw AI Response",
+   "read_only": 1
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Text",
+   "label": "Error Message",
+   "read_only": 1
+  }
+ ],
+ "modified": "2026-04-18 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Ai Importer",
+ "name": "AI Invoice Import",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "write": 1
+  },
+  {
+   "create": 0,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
