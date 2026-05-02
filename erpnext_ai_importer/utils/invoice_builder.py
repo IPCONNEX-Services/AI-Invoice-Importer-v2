@@ -3,7 +3,7 @@ import frappe
 
 def build_purchase_invoice(import_doc):
     """
-    Build, insert, and submit a Purchase Invoice from a validated AI Invoice Import doc.
+    Build, insert, and submit a Purchase Invoice from a validated AI Document Import doc.
     Returns the new Purchase Invoice name.
     """
     settings = frappe.get_single("AI Import Settings")

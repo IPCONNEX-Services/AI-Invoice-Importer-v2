@@ -8,7 +8,7 @@ from erpnext_ai_importer.utils.file_detector import detect_file_type, extract_zi
 def upload_invoice(company, provider=None, scanned_mode=None):
     """
     POST endpoint. Expects multipart file in frappe.request.files["file"].
-    Creates AI Invoice Import record(s) and enqueues extraction.
+    Creates AI Document Import record(s) and enqueues extraction.
     Returns list of created record names.
     """
     if "file" not in frappe.request.files:
@@ -48,7 +48,7 @@ def _create_record(file_path, company, provider, scanned_mode):
     fname = os.path.basename(file_path)
     ftype = detect_file_type(file_path)
 
-    doc = frappe.new_doc("AI Invoice Import")
+    doc = frappe.new_doc("AI Document Import")
     doc.company = company
     doc.file_type = ftype
     doc.status = "Draft"
@@ -64,7 +64,7 @@ def _create_record(file_path, company, provider, scanned_mode):
     file_doc = frappe.get_doc({
         "doctype": "File",
         "file_name": fname,
-        "attached_to_doctype": "AI Invoice Import",
+        "attached_to_doctype": "AI Document Import",
         "attached_to_name": doc.name,
         "attached_to_field": "source_file",
         "content": raw,

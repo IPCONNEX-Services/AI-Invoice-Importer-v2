@@ -5,11 +5,11 @@ from erpnext_ai_importer.utils.invoice_builder import build_purchase_invoice
 @frappe.whitelist()
 def create_purchase_invoice(import_name):
     """
-    Validates the AI Invoice Import record and creates a Purchase Invoice.
+    Validates the AI Document Import record and creates a Purchase Invoice.
     Called from the form JS after user confirmation.
     Returns the new Purchase Invoice name.
     """
-    doc = frappe.get_doc("AI Invoice Import", import_name)
+    doc = frappe.get_doc("AI Document Import", import_name)
 
     if doc.status == "Submitted":
         frappe.throw("This import has already been submitted.")

@@ -207,7 +207,7 @@ class AiImporterPage {
 		frappe.call({
 			method: "frappe.client.get_list",
 			args: {
-				doctype: "AI Invoice Import",
+				doctype: "AI Document Import",
 				fields: [
 					"name", "company", "supplier", "extracted_supplier_name",
 					"total", "status", "purchase_invoice",

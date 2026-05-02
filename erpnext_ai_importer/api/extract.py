@@ -7,10 +7,10 @@ from erpnext_ai_importer.utils.fuzzy_matcher import match_supplier, best_item_ma
 
 def run_extraction(import_name):
     """
-    Background job. Runs the full extraction pipeline for one AI Invoice Import record.
+    Background job. Runs the full extraction pipeline for one AI Document Import record.
     Called via frappe.enqueue — not a whitelist method.
     """
-    doc = frappe.get_doc("AI Invoice Import", import_name)
+    doc = frappe.get_doc("AI Document Import", import_name)
     settings = frappe.get_single("AI Import Settings")
     success = 0
     tokens_used = 0
@@ -85,7 +85,7 @@ def run_extraction(import_name):
     except Exception:
         doc.status = "Failed"
         doc.error_message = frappe.get_traceback()
-        frappe.log_error(doc.error_message, f"AI Invoice Import extraction failed: {import_name}")
+        frappe.log_error(doc.error_message, f"AI Document Import extraction failed: {import_name}")
 
     finally:
         doc.save(ignore_permissions=True)

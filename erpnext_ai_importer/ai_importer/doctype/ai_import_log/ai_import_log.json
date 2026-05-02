@@ -5,7 +5,7 @@
  "engine": "InnoDB",
  "field_order": ["import_record", "timestamp", "provider", "model", "extraction_method", "tokens_used", "success", "error"],
  "fields": [
-  {"fieldname": "import_record", "fieldtype": "Link", "label": "Import Record", "options": "AI Invoice Import", "in_list_view": 1},
+  {"fieldname": "import_record", "fieldtype": "Link", "label": "Import Record", "options": "AI Document Import", "in_list_view": 1},
   {"fieldname": "timestamp", "fieldtype": "Datetime", "label": "Timestamp", "in_list_view": 1},
   {"fieldname": "provider", "fieldtype": "Data", "label": "Provider", "in_list_view": 1},
   {"fieldname": "model", "fieldtype": "Data", "label": "Model"},

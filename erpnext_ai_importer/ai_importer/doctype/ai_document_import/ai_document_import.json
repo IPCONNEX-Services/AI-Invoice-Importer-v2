@@ -1,11 +1,12 @@
 {
  "actions": [],
- "autoname": "AI-IMP-.YYYY.-.#####",
+ "autoname": "AI-DOC-.YYYY.-.#####",
  "creation": "2026-04-18 00:00:00.000000",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "company",
+  "document_type",
   "source_file",
   "file_type",
   "status",
@@ -14,7 +15,11 @@
   "model_used",
   "extraction_method",
   "ai_confidence",
-  "section_supplier",
+  "source",
+  "source_metadata",
+  "section_party",
+  "party_type",
+  "party",
   "extracted_supplier_name",
   "supplier",
   "supplier_match_score",
@@ -32,6 +37,7 @@
   "items",
   "section_result",
   "purchase_invoice",
+  "target_docname",
   "section_debug",
   "raw_ai_response",
   "error_message"
@@ -43,6 +49,14 @@
    "label": "Company",
    "options": "Company",
    "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Select",
+   "label": "Document Type",
+   "options": "Auto-Detect\nPurchase Invoice\nPurchase Quotation\nSales Order\nPayment Entry",
+   "default": "Purchase Invoice",
    "in_list_view": 1
   },
   {
@@ -61,7 +75,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nExtracting\nPending Validation\nSubmitted\nFailed",
+   "options": "Draft\nExtracting\nPending Type Selection\nPending Validation\nPending Suggestions\nSubmitted\nFailed",
    "default": "Draft",
    "in_list_view": 1,
    "read_only": 1
@@ -96,43 +110,72 @@
    "in_list_view": 1
   },
   {
-   "fieldname": "section_supplier",
+   "fieldname": "source",
+   "fieldtype": "Select",
+   "label": "Source",
+   "options": "Manual Upload\nDrop Zone\nWebhook",
+   "default": "Manual Upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "source_metadata",
+   "fieldtype": "Long Text",
+   "label": "Source Metadata",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "section_party",
    "fieldtype": "Section Break",
-   "label": "Supplier"
+   "label": "Party"
+  },
+  {
+   "fieldname": "party_type",
+   "fieldtype": "Select",
+   "label": "Party Type",
+   "options": "Customer\nSupplier"
+  },
+  {
+   "fieldname": "party",
+   "fieldtype": "Dynamic Link",
+   "label": "Party",
+   "options": "party_type",
+   "in_list_view": 1
   },
   {
    "fieldname": "extracted_supplier_name",
    "fieldtype": "Data",
-   "label": "Extracted Supplier Name",
+   "label": "Extracted Party Name",
    "read_only": 1
   },
   {
    "fieldname": "supplier",
    "fieldtype": "Link",
-   "label": "Supplier (Matched)",
+   "label": "Supplier (Legacy)",
    "options": "Supplier",
-   "in_list_view": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "supplier_match_score",
    "fieldtype": "Percent",
-   "label": "Supplier Match %",
+   "label": "Party Match %",
    "read_only": 1
   },
   {
    "fieldname": "section_invoice",
    "fieldtype": "Section Break",
-   "label": "Invoice Details"
+   "label": "Document Details"
   },
   {
    "fieldname": "invoice_number",
    "fieldtype": "Data",
-   "label": "Invoice Number"
+   "label": "Reference Number"
   },
   {
    "fieldname": "invoice_date",
    "fieldtype": "Date",
-   "label": "Invoice Date"
+   "label": "Document Date"
   },
   {
    "fieldname": "due_date",
@@ -181,7 +224,7 @@
    "fieldname": "items",
    "fieldtype": "Table",
    "label": "Items",
-   "options": "AI Invoice Import Item"
+   "options": "AI Document Import Item"
   },
   {
    "fieldname": "section_result",
@@ -193,6 +236,12 @@
    "fieldtype": "Link",
    "label": "Purchase Invoice Created",
    "options": "Purchase Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "target_docname",
+   "fieldtype": "Data",
+   "label": "Created Document",
    "read_only": 1
   },
   {
@@ -214,10 +263,10 @@
    "read_only": 1
   }
  ],
- "modified": "2026-04-18 00:00:00.000000",
+ "modified": "2026-05-02 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Ai Importer",
- "name": "AI Invoice Import",
+ "name": "AI Document Import",
  "owner": "Administrator",
  "permissions": [
   {
@@ -238,6 +287,22 @@
    "read": 1,
    "report": 1,
    "role": "Accounts Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase User",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "read": 1,
+   "report": 1,
+   "role": "Sales User",
    "write": 1
   },
   {

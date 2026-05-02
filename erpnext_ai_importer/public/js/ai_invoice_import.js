@@ -1,4 +1,4 @@
-frappe.ui.form.on("AI Invoice Import", {
+frappe.ui.form.on("AI Document Import", {
     refresh(frm) {
         frm.disable_save();
         _render_supplier_confidence(frm);
@@ -7,7 +7,7 @@ frappe.ui.form.on("AI Invoice Import", {
     },
 });
 
-frappe.ui.form.on("AI Invoice Import Item", {
+frappe.ui.form.on("AI Document Import Item", {
     item_code(frm, cdt, cdn) {
         const row = locals[cdt][cdn];
         if (row.item_code) {

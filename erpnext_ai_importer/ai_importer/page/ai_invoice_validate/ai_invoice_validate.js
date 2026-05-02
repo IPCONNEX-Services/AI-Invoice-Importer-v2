@@ -43,7 +43,7 @@ class AiValidatePage {
 
 	_load() {
 		Promise.all([
-			frappe.call({ method: "frappe.client.get", args: { doctype: "AI Invoice Import", name: this.name } }),
+			frappe.call({ method: "frappe.client.get", args: { doctype: "AI Document Import", name: this.name } }),
 			frappe.call({ method: "frappe.client.get", args: { doctype: "AI Import Settings", name: "AI Import Settings" } }),
 		]).then(([doc_r, settings_r]) => {
 			this.doc = doc_r.message;
@@ -399,7 +399,7 @@ class AiValidatePage {
 		}
 		frappe.call({
 			method: "frappe.client.set_value",
-			args: { doctype: "AI Invoice Import", name: this.name, fieldname: updates },
+			args: { doctype: "AI Document Import", name: this.name, fieldname: updates },
 		}).then((r) => {
 			if (r.message) {
 				frappe.show_alert({ message: `${fieldname} saved`, indicator: "green" }, 2);
@@ -412,7 +412,7 @@ class AiValidatePage {
 	_save_item_field(row_name, fieldname, value) {
 		frappe.call({
 			method: "frappe.client.set_value",
-			args: { doctype: "AI Invoice Import Item", name: row_name, fieldname, value },
+			args: { doctype: "AI Document Import Item", name: row_name, fieldname, value },
 		}).then((r) => {
 			if (r.message) {
 				frappe.show_alert({ message: "Item mapped", indicator: "green" }, 2);

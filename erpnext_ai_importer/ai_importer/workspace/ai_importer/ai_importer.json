@@ -1,11 +1,11 @@
 {
  "category": "Modules",
  "charts": [],
- "content": "[{\"id\": \"b1\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"AI Invoice Importer\", \"col\": 12}}]",
+ "content": "[{\"id\": \"b1\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"AI Document Importer\", \"col\": 12}}]",
  "custom_blocks": [
   {
    "custom_block_name": "ai-invoice-importer",
-   "label": "AI Invoice Importer"
+   "label": "AI Document Importer"
   }
  ],
  "creation": "2026-04-18 00:00:00.000000",
@@ -49,9 +49,9 @@
    "doctype": "DocType",
    "format": "",
    "icon": "file",
-   "label": "AI Invoice Import",
-   "link_to": "AI Invoice Import",
-   "name": "AI Invoice Import",
+   "label": "AI Document Import",
+   "link_to": "AI Document Import",
+   "name": "AI Document Import",
    "stats_filter": "",
    "type": "DocType"
   },
