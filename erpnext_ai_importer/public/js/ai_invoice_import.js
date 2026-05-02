@@ -1,6 +1,5 @@
 frappe.ui.form.on("AI Document Import", {
     refresh(frm) {
-        frm.disable_save();
         _render_supplier_confidence(frm);
         _add_action_buttons(frm);
         _highlight_low_confidence_items(frm);
