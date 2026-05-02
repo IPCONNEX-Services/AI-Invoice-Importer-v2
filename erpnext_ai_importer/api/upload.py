@@ -5,7 +5,7 @@ from erpnext_ai_importer.utils.file_detector import detect_file_type, extract_zi
 
 
 @frappe.whitelist()
-def upload_invoice(company, provider=None, scanned_mode=None):
+def upload_invoice(company=None, provider=None, scanned_mode=None):
     """
     POST endpoint. Expects multipart file in frappe.request.files["file"].
     Creates AI Document Import record(s) and enqueues extraction.
@@ -49,7 +49,7 @@ def _create_record(file_path, company, provider, scanned_mode):
     ftype = detect_file_type(file_path)
 
     doc = frappe.new_doc("AI Document Import")
-    doc.company = company
+    doc.company = company or frappe.defaults.get_user_default("Company")
     doc.file_type = ftype
     doc.status = "Draft"
     if provider:
