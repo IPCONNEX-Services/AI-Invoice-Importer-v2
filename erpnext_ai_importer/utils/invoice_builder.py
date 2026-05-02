@@ -22,11 +22,16 @@ def build_purchase_invoice(import_doc):
         pi.set_taxes()
 
     for item in import_doc.items:
+        qty = float(item.qty or 1)
+        rate = float(item.rate or 0)
+        amount = float(item.amount or 0)
+        if not rate and amount and qty:
+            rate = amount / qty
         pi.append("items", {
             "item_code": item.item_code,
             "item_name": item.ai_description,
-            "qty": item.qty or 1,
-            "rate": item.rate or 0,
+            "qty": qty,
+            "rate": rate,
             "uom": frappe.db.get_value("Item", item.item_code, "stock_uom") or "Unit",
         })
 

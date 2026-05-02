@@ -87,7 +87,7 @@ def run_extraction(import_name):
                 "amount": float(li.get("amount") or 0),
             })
 
-        doc.status = "Pending Validation"
+        doc.status = _check_duplicate_status(doc, import_name)
         doc.error_message = ""
         success = 1
 
@@ -128,6 +128,25 @@ def reextract(import_name):
         import_name=import_name,
     )
     return "Queued"
+
+
+def _check_duplicate_status(doc, import_name):
+    inv_no = doc.invoice_number
+    supplier = doc.supplier
+    if not inv_no or not supplier:
+        return "Pending Validation"
+    existing_pi = frappe.db.exists("Purchase Invoice", {
+        "bill_no": inv_no, "supplier": supplier, "docstatus": ["!=", 2],
+    })
+    if existing_pi:
+        return "Potential Duplicate"
+    existing_import = frappe.db.get_value("AI Document Import", {
+        "invoice_number": inv_no, "supplier": supplier,
+        "status": "Submitted", "name": ["!=", import_name],
+    }, "name")
+    if existing_import:
+        return "Potential Duplicate"
+    return "Pending Validation"
 
 
 def _resolve_model(settings, provider):

@@ -14,8 +14,8 @@ def create_purchase_invoice(import_name):
     if doc.status == "Submitted":
         frappe.throw("This import has already been submitted.")
 
-    if doc.status != "Pending Validation":
-        frappe.throw(f"Cannot submit an import with status '{doc.status}'. It must be 'Pending Validation'.")
+    if doc.status not in ("Pending Validation", "Potential Duplicate"):
+        frappe.throw(f"Cannot submit an import with status '{doc.status}'. It must be 'Pending Validation' or 'Potential Duplicate'.")
 
     if not doc.supplier:
         frappe.throw("Supplier is required before creating an invoice.")

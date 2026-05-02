@@ -5,11 +5,180 @@ frappe.pages["ai-invoice-validate"].on_page_load = function (wrapper) {
 		single_column: true,
 	});
 
+	// ── IPCONNEX Design System ────────────────────────────────────────────────
+	frappe.dom.set_style(`
+		.aiv-root {
+			--blue:#0B70E1; --blue-dk:#0958B3; --blue-lt:#E8F2FF;
+			--navy:#0B1D3A; --border:#D8E4F0; --bg:#F4F7FB; --surface:#FFFFFF;
+			--text:#0B1D3A; --text-sub:#5A7A9A; --text-muted:#9BB5CC;
+			--ok:#0D7C3D; --ok-bg:#EAF7EE; --ok-bd:#A7D7BA;
+			--err:#C7201A; --err-bg:#FDECEA; --err-bd:#F5AAAA;
+			--warn:#A85A00; --warn-bg:#FFF3E0; --warn-bd:#F8D08A;
+			--r-sm:6px; --r-md:10px; --r-lg:14px;
+			--sh-sm:0 1px 4px rgba(11,29,58,.07);
+			--sh-md:0 4px 16px rgba(11,29,58,.10);
+			max-width:none; margin:0; padding:20px 16px 60px;
+			font-family:'Inter','Segoe UI',-apple-system,sans-serif;
+		}
+		.aiv-header {
+			display:grid; grid-template-columns:3fr 1.2fr 1fr auto; gap:16px;
+			padding:14px 20px; background:var(--bg); border:1px solid var(--border);
+			border-radius:var(--r-md) var(--r-md) 0 0; border-bottom:none; align-items:start;
+		}
+		.aiv-card {
+			border:1px solid var(--border); border-radius:0 0 var(--r-md) var(--r-md);
+			background:var(--surface); box-shadow:var(--sh-sm);
+		}
+		.aiv-mi-section {
+			padding:20px; border-bottom:2px solid var(--border); background:var(--bg);
+		}
+		.aiv-section { padding:16px 20px; border-bottom:1px solid var(--border); }
+		.aiv-section-title {
+			font-size:0.7em; font-weight:700; color:var(--text-muted);
+			text-transform:uppercase; letter-spacing:0.07em; margin-bottom:14px;
+		}
+		.aiv-mi-grid { display:grid; grid-template-columns:1fr 1fr; gap:32px; }
+		.aiv-meta-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+		.aiv-meta-label {
+			font-size:0.72em; font-weight:600; color:var(--text-muted);
+			text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;
+		}
+		.aiv-meta-val { font-size:0.88em; color:var(--text); }
+		.aiv-field-label {
+			font-size:0.78em; font-weight:600; color:var(--text);
+			margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;
+		}
+		.aiv-input {
+			width:100%; border:1px solid var(--border); border-radius:var(--r-sm);
+			padding:7px 10px; background:var(--surface); box-sizing:border-box;
+			font-size:0.9em; font-family:inherit; color:var(--text);
+		}
+		.aiv-input:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(11,112,225,.12); }
+		.aiv-match-label {
+			font-size:0.72em; font-weight:700; color:var(--text);
+			text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;
+		}
+		.aiv-match-extracted { font-size:0.75em; color:var(--text-muted); margin-bottom:8px; }
+		.aiv-match-row { display:flex; align-items:stretch; gap:8px; margin-bottom:8px; }
+		.aiv-match-input-wrap { position:relative; flex:1; }
+		.aiv-match-input {
+			width:100%; border-radius:var(--r-sm); padding:8px 12px; box-sizing:border-box;
+			font-size:0.9em; font-weight:500; font-family:inherit; outline:none;
+		}
+		.aiv-match-input.ok  { border:2px solid var(--ok-bd);  background:var(--ok-bg);  color:var(--text); }
+		.aiv-match-input.warn{ border:2px solid var(--warn-bd); background:var(--warn-bg); color:var(--text); }
+		.aiv-match-input.err { border:2px solid var(--err-bd);  background:var(--err-bg);  color:var(--text); }
+		.aiv-match-input.neu { border:2px solid var(--border);  background:var(--bg);      color:var(--text); }
+		.aiv-score-chip {
+			display:flex; align-items:center; padding:0 12px; border-radius:var(--r-sm);
+			font-size:0.9em; font-weight:700; white-space:nowrap; min-width:52px;
+			justify-content:center;
+		}
+		.aiv-score-chip.ok  { background:var(--ok-bg);  border:2px solid var(--ok-bd);  color:var(--ok); }
+		.aiv-score-chip.warn{ background:var(--warn-bg); border:2px solid var(--warn-bd); color:var(--warn); }
+		.aiv-score-chip.err { background:var(--err-bg);  border:2px solid var(--err-bd);  color:var(--err); }
+		.aiv-suggestions {
+			display:none; position:absolute; top:100%; left:0; right:0; margin-top:2px;
+			background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm);
+			box-shadow:var(--sh-md); z-index:200; max-height:200px; overflow-y:auto; font-size:0.85em;
+		}
+		.aiv-suggestion-item {
+			padding:8px 12px; cursor:pointer; border-bottom:1px solid var(--bg); color:var(--text);
+		}
+		.aiv-suggestion-item:hover { background:var(--blue-lt); color:var(--blue-dk); }
+		.aiv-alts { display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
+		.aiv-pill {
+			font-size:0.74em; padding:3px 9px; border:1px solid var(--border);
+			border-radius:12px; background:var(--bg); color:var(--text-sub);
+			cursor:pointer; white-space:nowrap;
+		}
+		.aiv-pill:hover { border-color:var(--blue); color:var(--blue); }
+		.aiv-pill-score { color:var(--text-muted); margin-left:3px; }
+		.aiv-table { width:100%; border-collapse:collapse; font-size:0.83em; }
+		.aiv-table thead th {
+			padding:7px 10px; border:1px solid var(--border);
+			color:var(--text-sub); font-weight:500; background:var(--bg); text-align:left;
+		}
+		.aiv-table thead th.center { text-align:center; width:60px; }
+		.aiv-table thead th.right  { text-align:right;  width:90px; }
+		.aiv-table thead th.qty    { text-align:right;  width:60px; }
+		.aiv-table tbody td { padding:7px 10px; border:1px solid var(--border); color:var(--text); vertical-align:middle; }
+		.aiv-table tbody td.center { text-align:center; }
+		.aiv-table tbody td.right  { text-align:right; }
+		.aiv-row-warn { background:var(--warn-bg); }
+		.aiv-badge { display:inline-block; padding:4px 12px; border-radius:var(--r-sm); font-size:0.82em; font-weight:600; }
+		.aiv-badge-draft      { background:#f1f5f9; color:var(--text-sub); }
+		.aiv-badge-extracting { background:var(--blue-lt); color:var(--blue-dk); }
+		.aiv-badge-pending    { background:var(--warn-bg); color:var(--warn); }
+		.aiv-badge-duplicate  { background:var(--err-bg);  color:var(--err);  }
+		.aiv-badge-submitted  { background:var(--ok-bg);   color:var(--ok);   }
+		.aiv-badge-failed     { background:var(--err-bg);  color:var(--err);  }
+		.aiv-action-bar {
+			padding:14px 16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+		}
+		.aiv-btn-primary {
+			background:var(--blue); color:#fff; border:none; border-radius:var(--r-sm);
+			padding:9px 18px; font-size:0.9em; cursor:pointer; font-weight:500; font-family:inherit;
+		}
+		.aiv-btn-primary:disabled { background:var(--text-muted); cursor:not-allowed; }
+		.aiv-btn-primary.err { background:var(--err); }
+		.aiv-btn-secondary {
+			background:var(--surface); border:1px solid var(--border); color:var(--text);
+			border-radius:var(--r-sm); padding:9px 14px; font-size:0.9em; cursor:pointer; font-family:inherit;
+		}
+		.aiv-btn-create {
+			font-size:0.72em; padding:2px 8px; border:1px solid var(--blue);
+			border-radius:var(--r-sm); background:var(--surface); color:var(--blue);
+			cursor:pointer; white-space:nowrap;
+		}
+		.aiv-item-input {
+			width:100%; border:1px solid var(--warn-bd); border-radius:3px; padding:4px 6px;
+			background:var(--surface); box-sizing:border-box; font-size:0.85em; font-family:inherit; color:var(--text);
+		}
+		.aiv-item-suggestions {
+			display:none; position:absolute; top:100%; left:0; right:0;
+			background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm);
+			box-shadow:var(--sh-sm); z-index:100; max-height:160px; overflow-y:auto; font-size:0.85em;
+		}
+		.aiv-item-option {
+			padding:6px 10px; cursor:pointer; border-bottom:1px solid var(--bg); color:var(--text);
+		}
+		.aiv-item-option:hover { background:var(--blue-lt); }
+		.aiv-link { color:var(--blue); text-decoration:none; }
+		.aiv-link:hover { text-decoration:underline; }
+		.aiv-back-link { margin-left:auto; font-size:0.85em; color:var(--text-sub); text-decoration:none; }
+		.aiv-back-link:hover { color:var(--blue); }
+		.aiv-warn-text { font-size:0.82em; color:var(--warn); }
+		.aiv-doc-name { font-size:0.72em; color:var(--text-muted); margin-top:4px; display:block; }
+		.aiv-totals-row { font-size:0.85em; color:var(--text-sub); }
+		.aiv-totals-row + .aiv-totals-row { margin-top:2px; }
+		.aiv-grand-total { font-size:1.2em; font-weight:700; margin-top:8px; color:var(--text); }
+		.aiv-conf-ok   { color:var(--ok);   font-weight:600; font-size:1.1em; }
+		.aiv-conf-warn { color:var(--warn);  font-weight:600; font-size:1.1em; }
+		.aiv-conf-err  { color:var(--err);   font-weight:600; font-size:1.1em; }
+		.aiv-dup-banner {
+			display:flex; align-items:flex-start; gap:10px;
+			margin-bottom:12px; padding:12px 16px; border-radius:var(--r-md);
+			background:var(--err-bg); border:1px solid var(--err-bd);
+			font-size:0.85em; color:var(--err); line-height:1.5;
+		}
+		.aiv-dup-icon { font-size:1.2em; flex-shrink:0; margin-top:1px; }
+		.aiv-dup-links a { color:var(--err); font-weight:600; text-decoration:underline; }
+		.aiv-tax-chip {
+			display:inline-block; background:var(--ok-bg); border:1px solid var(--ok-bd);
+			padding:4px 10px; border-radius:var(--r-sm); font-size:0.85em; margin-bottom:6px;
+		}
+		.aiv-model-sub { font-size:0.78em; color:var(--text-muted); }
+	`);
+
 	const route = frappe.get_route();
 	const name = route && route[1] ? decodeURIComponent(route[1]) : null;
 	if (!name) {
 		$(wrapper).find(".page-content").html(
-			'<div style="padding:48px;text-align:center;color:#dc2626">No import name specified. <a href="/app/ai-invoice-importer">← Back to Importer</a></div>'
+			`<div style="padding:48px;text-align:center;color:var(--err,#C7201A)">
+				No import name specified.
+				<a class="aiv-link" href="/app/ai-importer">← Back to Importer</a>
+			</div>`
 		);
 		return;
 	}
@@ -53,12 +222,13 @@ class AiValidatePage {
 			this.match_preview = preview_r.message || {};
 			if (!this.doc) {
 				$(this.wrapper).find(".page-content").html(
-					`<div style="padding:48px;text-align:center;color:#dc2626">Import record "${this.name}" not found.</div>`
+					`<div style="padding:48px;text-align:center" class="aiv-conf-err">Import record "${this.name}" not found.</div>`
 				);
 				return;
 			}
 			this.page.set_title(`Review — ${this.name}`);
 			this._render();
+			this._check_duplicates();
 		});
 	}
 
@@ -69,71 +239,71 @@ class AiValidatePage {
 		const low_threshold = s.supplier_low_confidence || 60;
 		const item_threshold = s.item_match_threshold || 70;
 
+		const conf_class = d.ai_confidence >= 80 ? "aiv-conf-ok" : d.ai_confidence >= 50 ? "aiv-conf-warn" : "aiv-conf-err";
 		const ai_conf = d.ai_confidence ? `${Math.round(d.ai_confidence)}%` : "—";
-		const ai_conf_color = d.ai_confidence >= 80 ? "#16a34a" : d.ai_confidence >= 50 ? "#d97706" : "#dc2626";
 
 		const items_html = (d.items || []).map((item) => this._item_row_html(item, item_threshold)).join("");
 		const tax_html = this._tax_html(d);
 		const status_badge = this._status_badge(d.status);
 		const unmapped_count = (d.items || []).filter(i => !i.item_code).length;
 		const supplier_score = mp.current_supplier_score != null ? mp.current_supplier_score : (d.supplier_match_score || 0);
-		const can_submit = d.status === "Pending Validation" && (mp.current_supplier || d.supplier) && supplier_score >= low_threshold && unmapped_count === 0;
+		const can_submit = ["Pending Validation", "Potential Duplicate"].includes(d.status) && (mp.current_supplier || d.supplier) && supplier_score >= low_threshold && unmapped_count === 0;
 
 		$(this.wrapper).find(".page-content").html(`
-			<div id="ai-validate-root" style="max-width:980px;margin:0 auto;padding:16px">
+			<div id="ai-validate-root" class="aiv-root">
 
 				<!-- Header bar -->
-				<div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;padding:14px 16px;
-					background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px 8px 0 0;border-bottom:none;align-items:start">
+				<div class="aiv-header">
 					${this._meta_field("Source File", this._file_link(d.source_file))}
-					${this._meta_field("Method", frappe.utils.escape_html(d.extraction_method || "—") + (d.model_used ? `<br><span style="font-size:0.78em;color:#94a3b8">${frappe.utils.escape_html(d.model_used)}</span>` : ""))}
-					${this._meta_field("AI Confidence", `<span style="color:${ai_conf_color};font-weight:600;font-size:1.1em">${ai_conf}</span>`)}
+					${this._meta_field("Method",
+						frappe.utils.escape_html(d.extraction_method || "—") +
+						(d.model_used ? `<br><span class="aiv-model-sub">${frappe.utils.escape_html(d.model_used)}</span>` : "")
+					)}
+					${this._meta_field("AI Confidence", `<span class="${conf_class}">${ai_conf}</span>`)}
 					<div style="text-align:right">
 						${status_badge}
-						<br><span style="font-size:0.72em;color:#94a3b8;margin-top:4px;display:block">${frappe.utils.escape_html(this.name)}</span>
+						<span class="aiv-doc-name">${frappe.utils.escape_html(this.name)}</span>
 					</div>
 				</div>
 
 				<!-- Main card -->
-				<div style="border:1px solid #e2e8f0;border-radius:0 0 8px 8px;background:#fff">
+				<div class="aiv-card">
 
 					<!-- Match Intelligence -->
-					<div style="padding:16px;border-bottom:2px solid #e2e8f0;background:#fafbfc">
-						<div style="font-size:0.7em;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px">
-							Match Intelligence
-						</div>
-						<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+					<div class="aiv-mi-section">
+						<div class="aiv-section-title">Match Intelligence</div>
+						<div class="aiv-mi-grid">
 							${this._match_block_html("company", "Our Company", mp.extracted_company, mp.company_matches || [], mp.current_company || d.company || "", mp.current_company_score != null ? mp.current_company_score : null)}
 							${this._match_block_html("supplier", "Supplier / Party", mp.extracted_supplier, mp.supplier_matches || [], mp.current_supplier || d.supplier || "", supplier_score)}
 						</div>
 					</div>
 
 					<!-- Invoice meta -->
-					<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px 16px;border-bottom:1px solid #e2e8f0">
+					<div class="aiv-section aiv-meta-grid">
 						${this._editable_field("invoice_number", "Doc / Invoice #", d.invoice_number)}
 						${this._editable_field("invoice_date", "Date", d.invoice_date, "date")}
 						${this._editable_field("due_date", "Due Date", d.due_date, "date")}
 						<div>
-							<div style="font-size:0.78em;font-weight:600;color:#374151;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em">Currency</div>
-							<div style="font-size:0.9em;color:#374151;padding:7px 0">${frappe.utils.escape_html(d.currency || "—")}</div>
+							<div class="aiv-field-label">Currency</div>
+							<div style="font-size:0.9em;padding:7px 0">${frappe.utils.escape_html(d.currency || "—")}</div>
 						</div>
 					</div>
 
 					<!-- Line items -->
-					<div style="padding:16px;border-bottom:1px solid #e2e8f0">
-						<div style="font-size:0.8em;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px">
+					<div class="aiv-section">
+						<div class="aiv-section-title" style="margin-bottom:10px">
 							Line Items
-							${unmapped_count > 0 ? `<span style="font-size:0.85em;font-weight:400;color:#d97706;margin-left:8px">⚠ ${unmapped_count} need mapping</span>` : ""}
+							${unmapped_count > 0 ? `<span style="font-size:0.85em;font-weight:400;color:var(--warn);margin-left:8px">⚠ ${unmapped_count} need mapping</span>` : ""}
 						</div>
-						<table style="width:100%;border-collapse:collapse;font-size:0.83em" id="ai-items-table">
+						<table class="aiv-table" id="ai-items-table">
 							<thead>
-								<tr style="background:#f8fafc;text-align:left">
-									<th style="padding:7px 10px;border:1px solid #e2e8f0;color:#64748b;font-weight:500">AI Description</th>
-									<th style="padding:7px 10px;border:1px solid #e2e8f0;color:#64748b;font-weight:500">Matched Item</th>
-									<th style="padding:7px 10px;border:1px solid #e2e8f0;color:#64748b;font-weight:500;text-align:center;width:60px">Match %</th>
-									<th style="padding:7px 10px;border:1px solid #e2e8f0;color:#64748b;font-weight:500;text-align:right;width:60px">Qty</th>
-									<th style="padding:7px 10px;border:1px solid #e2e8f0;color:#64748b;font-weight:500;text-align:right;width:90px">Rate</th>
-									<th style="padding:7px 10px;border:1px solid #e2e8f0;color:#64748b;font-weight:500;text-align:right;width:90px">Amount</th>
+								<tr>
+									<th>AI Description</th>
+									<th>Matched Item</th>
+									<th class="center">Match %</th>
+									<th class="qty">Qty</th>
+									<th class="right">Rate</th>
+									<th class="right">Amount</th>
 								</tr>
 							</thead>
 							<tbody>${items_html}</tbody>
@@ -141,52 +311,38 @@ class AiValidatePage {
 					</div>
 
 					<!-- Taxes + Totals -->
-					<div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #e2e8f0">
-						<div style="padding:16px;border-right:1px solid #e2e8f0">
-							<div style="font-size:0.8em;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px">Detected Taxes</div>
+					<div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)">
+						<div style="padding:16px;border-right:1px solid var(--border)">
+							<div class="aiv-section-title" style="margin-bottom:8px">Detected Taxes</div>
 							${tax_html}
 						</div>
 						<div style="padding:16px;text-align:right">
-							<div style="font-size:0.85em;color:#64748b">Subtotal: <strong>${frappe.format(d.subtotal || 0, { fieldtype: "Currency", currency: d.currency })}</strong></div>
-							<div style="font-size:0.85em;color:#64748b;margin-top:2px">Taxes: <strong>${frappe.format(d.tax_amount || 0, { fieldtype: "Currency", currency: d.currency })}</strong></div>
-							<div style="font-size:1.2em;font-weight:700;margin-top:8px;color:#1e293b">${frappe.format(d.total || 0, { fieldtype: "Currency", currency: d.currency })}</div>
+							<div class="aiv-totals-row">Subtotal: <strong>${frappe.format(d.subtotal || 0, { fieldtype: "Currency", currency: d.currency })}</strong></div>
+							<div class="aiv-totals-row">Taxes: <strong>${frappe.format(d.tax_amount || 0, { fieldtype: "Currency", currency: d.currency })}</strong></div>
+							<div class="aiv-grand-total">${frappe.format(d.total || 0, { fieldtype: "Currency", currency: d.currency })}</div>
 						</div>
 					</div>
 
 					<!-- Action bar -->
-					<div style="padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-						${d.status === "Pending Validation" ? `
-							<button id="ai-submit-btn"
-								style="background:${can_submit ? "#4f46e5" : "#94a3b8"};color:#fff;border:none;
-								       border-radius:4px;padding:9px 18px;font-size:0.9em;cursor:${can_submit ? "pointer" : "not-allowed"};font-weight:500">
+					<div class="aiv-action-bar">
+						${["Pending Validation", "Potential Duplicate"].includes(d.status) ? `
+							<button id="ai-submit-btn" class="aiv-btn-primary" ${can_submit ? "" : "disabled"}>
 								✓ Create Purchase Invoice
 							</button>
-							<button id="ai-reextract-btn"
-								style="background:#fff;border:1px solid #cbd5e1;color:#374151;
-								       border-radius:4px;padding:9px 14px;font-size:0.9em;cursor:pointer">
-								↺ Re-extract
-							</button>
+							<button id="ai-reextract-btn" class="aiv-btn-secondary">↺ Re-extract</button>
 						` : ""}
 						${d.status === "Draft" ? `
-							<button id="ai-reextract-btn"
-								style="background:#4f46e5;color:#fff;border:none;
-								       border-radius:4px;padding:9px 18px;font-size:0.9em;cursor:pointer;font-weight:500">
-								⚙ Extract Now
-							</button>
+							<button id="ai-reextract-btn" class="aiv-btn-primary">⚙ Extract Now</button>
 						` : ""}
 						${d.status === "Submitted" && d.purchase_invoice ? `
 							<a href="${frappe.utils.get_form_link("Purchase Invoice", d.purchase_invoice)}"
-								style="background:#fff;border:1px solid #4f46e5;color:#4f46e5;
-								       border-radius:4px;padding:9px 14px;font-size:0.9em;text-decoration:none;font-weight:500">
+								class="aiv-btn-secondary aiv-link" style="text-decoration:none">
 								View ${frappe.utils.escape_html(d.purchase_invoice)} →
 							</a>
 						` : ""}
-						<a href="/app/ai-invoice-importer"
-							style="margin-left:auto;font-size:0.85em;color:#64748b;text-decoration:none">
-							← Back to Importer
-						</a>
-						<span id="ai-submit-warning"
-							style="font-size:0.82em;color:#d97706;${(unmapped_count > 0 || supplier_score < low_threshold) && d.status === "Pending Validation" ? "" : "display:none"}">
+						<a href="/app/ai-importer" class="aiv-back-link">← Back to Importer</a>
+						<span id="ai-submit-warning" class="aiv-warn-text"
+							${(unmapped_count > 0 || supplier_score < low_threshold) && ["Pending Validation", "Potential Duplicate"].includes(d.status) ? "" : 'style="display:none"'}>
 							${unmapped_count > 0 ? `⚠ ${unmapped_count} item(s) need mapping` : "⚠ Supplier confidence too low — confirm the supplier above"}
 						</span>
 					</div>
@@ -201,49 +357,37 @@ class AiValidatePage {
 	_match_block_html(fieldname, label, extracted, matches, current_val, score) {
 		const top_score = score != null ? score : (matches[0] ? matches[0].score : 0);
 		const has_score = top_score > 0 || current_val;
-		const score_color = top_score >= 85 ? "#16a34a" : top_score >= 60 ? "#d97706" : "#dc2626";
-		const score_bg    = top_score >= 85 ? "#f0fdf4" : top_score >= 60 ? "#fffbeb" : (current_val ? "#fef2f2" : "#f8fafc");
-		const border_col  = top_score >= 85 ? "#86efac" : top_score >= 60 ? "#fde68a" : (current_val ? "#fca5a5" : "#e2e8f0");
+		const tier = top_score >= 85 ? "ok" : top_score >= 60 ? "warn" : (current_val ? "err" : "neu");
 		const alts = matches.slice(1, 3);
 
 		return `
 		<div>
-			<div style="font-size:0.72em;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">${label}</div>
-			${extracted ? `<div style="font-size:0.75em;color:#94a3b8;margin-bottom:8px">AI extracted: <em>"${frappe.utils.escape_html(extracted)}"</em></div>` : `<div style="font-size:0.75em;color:#94a3b8;margin-bottom:8px">No text extracted yet</div>`}
-
-			<div style="display:flex;align-items:stretch;gap:8px;margin-bottom:8px">
-				<div style="position:relative;flex:1">
-					<input id="ai-${fieldname}-input" type="text"
-						value="${frappe.utils.escape_html(current_val || "")}"
-						placeholder="Search ${frappe.utils.escape_html(label)}…"
-						style="width:100%;border:2px solid ${border_col};border-radius:6px;padding:8px 12px;
-						       background:${score_bg};box-sizing:border-box;font-size:0.9em;font-weight:500;
-						       color:#1e293b;outline:none">
-					<div id="ai-${fieldname}-suggestions"
-						style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:2px;
-						       background:#fff;border:1px solid #cbd5e1;border-radius:6px;
-						       box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:200;max-height:200px;overflow-y:auto;font-size:0.85em"></div>
-				</div>
-				${has_score ? `
-				<div style="display:flex;align-items:center;padding:0 12px;border-radius:6px;
-				            background:${score_bg};border:2px solid ${border_col};
-				            font-size:0.9em;font-weight:700;color:${score_color};white-space:nowrap;min-width:52px;justify-content:center">
-					${top_score}%
-				</div>` : ""}
+			<div class="aiv-match-label">${label}</div>
+			<div class="aiv-match-extracted">
+				${extracted
+					? `AI extracted: <em>"${frappe.utils.escape_html(extracted)}"</em>`
+					: `No text extracted yet`}
 			</div>
-
+			<div class="aiv-match-row">
+				<div class="aiv-match-input-wrap">
+					<input id="ai-${fieldname}-input" type="text"
+						class="aiv-match-input ${tier}"
+						value="${frappe.utils.escape_html(current_val || "")}"
+						placeholder="Search ${frappe.utils.escape_html(label)}…">
+					<div id="ai-${fieldname}-suggestions" class="aiv-suggestions"></div>
+				</div>
+				${has_score ? `<div class="aiv-score-chip ${tier}">${top_score}%</div>` : ""}
+			</div>
 			${alts.length ? `
-			<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">
-				<span style="font-size:0.7em;color:#94a3b8;margin-right:2px">Also:</span>
+			<div class="aiv-alts">
+				<span style="font-size:0.7em;margin-right:2px" class="aiv-doc-name">Also:</span>
 				${alts.map(a => `
-					<button class="ai-alt-pick"
+					<button class="aiv-pill ai-alt-pick"
 						data-fieldname="${fieldname}"
 						data-value="${frappe.utils.escape_html(a.name)}"
-						data-display="${frappe.utils.escape_html(a.display)}"
-						style="font-size:0.74em;padding:3px 9px;border:1px solid #e2e8f0;border-radius:12px;
-						       background:#f8fafc;color:#475569;cursor:pointer;white-space:nowrap">
+						data-display="${frappe.utils.escape_html(a.display)}">
 						${frappe.utils.escape_html(a.display)}
-						<span style="color:#94a3b8;margin-left:3px">${a.score}%</span>
+						<span class="aiv-pill-score">${a.score}%</span>
 					</button>
 				`).join("")}
 			</div>` : ""}
@@ -252,86 +396,83 @@ class AiValidatePage {
 
 	_meta_field(label, value_html) {
 		return `<div>
-			<div style="font-size:0.72em;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">${label}</div>
-			<div style="font-size:0.88em;color:#374151">${value_html}</div>
+			<div class="aiv-meta-label">${label}</div>
+			<div class="aiv-meta-val">${value_html}</div>
 		</div>`;
 	}
 
 	_editable_field(fieldname, label, value, type) {
-		const val = value || "";
 		return `<div>
-			<div style="font-size:0.78em;font-weight:600;color:#374151;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em">${label}</div>
-			<input data-fieldname="${fieldname}" type="${type || "text"}" value="${frappe.utils.escape_html(val)}"
-				style="width:100%;border:1px solid #cbd5e1;border-radius:4px;padding:7px 10px;
-				       background:#fff;box-sizing:border-box;font-size:0.9em">
+			<div class="aiv-field-label">${label}</div>
+			<input data-fieldname="${fieldname}" type="${type || "text"}"
+				value="${frappe.utils.escape_html(value || "")}"
+				class="aiv-input">
 		</div>`;
 	}
 
 	_file_link(source_file) {
 		if (!source_file) return "—";
 		const name = source_file.split("/").pop();
-		return `<a href="${source_file}" target="_blank" style="color:#4f46e5">📎 ${frappe.utils.escape_html(name)}</a>`;
+		return `<a href="${source_file}" target="_blank" class="aiv-link">📎 ${frappe.utils.escape_html(name)}</a>`;
 	}
 
 	_item_row_html(item, threshold) {
 		const score = item.item_match_score || 0;
 		const needs_mapping = score < threshold || !item.item_code;
-		const row_bg = needs_mapping ? "#fffbeb" : "#fff";
-		const score_color = score >= 85 ? "#16a34a" : score >= threshold ? "#d97706" : "#dc2626";
+		const score_class = score >= 85 ? "aiv-conf-ok" : score >= threshold ? "aiv-conf-warn" : "aiv-conf-err";
 
 		const matched_cell = needs_mapping ? `
 			<div style="display:flex;flex-direction:column;gap:4px">
-				<span style="color:#d97706;font-size:0.85em">⚠ ${item.item_code ? "Low match" : "No match"}</span>
+				<div style="display:flex;align-items:center;gap:6px">
+					<span class="aiv-warn-text" style="font-size:0.85em">⚠ ${item.item_code ? "Low match" : "No match"}</span>
+					<button class="aiv-btn-create ai-create-item-btn"
+						data-row="${frappe.utils.escape_html(item.name)}"
+						data-desc="${frappe.utils.escape_html(item.ai_description || "")}">
+						+ New Item
+					</button>
+				</div>
 				<div style="position:relative">
-					<input type="text" class="ai-item-input" data-row="${frappe.utils.escape_html(item.name)}"
+					<input type="text" class="aiv-item-input ai-item-input" data-row="${frappe.utils.escape_html(item.name)}"
 						value="${frappe.utils.escape_html(item.item_code || "")}"
-						placeholder="Search item…"
-						style="width:100%;border:1px solid #fbbf24;border-radius:3px;padding:4px 6px;
-						       background:#fff;box-sizing:border-box;font-size:0.85em">
-					<div class="ai-item-suggestions" data-row="${frappe.utils.escape_html(item.name)}"
-						style="display:none;position:absolute;top:100%;left:0;right:0;
-						background:#fff;border:1px solid #cbd5e1;border-radius:4px;
-						box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:100;max-height:160px;overflow-y:auto;font-size:0.85em">
-					</div>
+						placeholder="Search item…">
+					<div class="aiv-item-suggestions ai-item-suggestions" data-row="${frappe.utils.escape_html(item.name)}"></div>
 				</div>
 			</div>
-		` : `<span style="color:#16a34a">✓ ${frappe.utils.escape_html(item.item_code || "—")}</span>`;
+		` : `<span class="aiv-conf-ok">✓ ${frappe.utils.escape_html(item.item_code || "—")}</span>`;
 
-		return `<tr style="background:${row_bg}">
-			<td style="padding:7px 10px;border:1px solid #e2e8f0">${frappe.utils.escape_html(item.ai_description || "—")}</td>
-			<td style="padding:7px 10px;border:1px solid #e2e8f0">${matched_cell}</td>
-			<td style="padding:7px 10px;border:1px solid #e2e8f0;text-align:center;color:${score_color};font-weight:600">${score}%</td>
-			<td style="padding:7px 10px;border:1px solid #e2e8f0;text-align:right">${item.qty || 0}</td>
-			<td style="padding:7px 10px;border:1px solid #e2e8f0;text-align:right">${frappe.format(item.rate || 0, { fieldtype: "Currency", currency: this.doc.currency })}</td>
-			<td style="padding:7px 10px;border:1px solid #e2e8f0;text-align:right">${frappe.format(item.amount || 0, { fieldtype: "Currency", currency: this.doc.currency })}</td>
+		return `<tr class="${needs_mapping ? "aiv-row-warn" : ""}">
+			<td>${frappe.utils.escape_html(item.ai_description || "—")}</td>
+			<td>${matched_cell}</td>
+			<td class="center"><span class="${score_class}" style="font-weight:600">${score}%</span></td>
+			<td class="right">${item.qty || 0}</td>
+			<td class="right">${frappe.format(item.rate || 0, { fieldtype: "Currency", currency: this.doc.currency })}</td>
+			<td class="right">${frappe.format(item.amount || 0, { fieldtype: "Currency", currency: this.doc.currency })}</td>
 		</tr>`;
 	}
 
 	_tax_html(d) {
 		if (!d.tax_amount || d.tax_amount === 0) {
-			return `<div style="font-size:0.85em;color:#94a3b8">No tax lines detected</div>`;
+			return `<div style="font-size:0.85em" class="aiv-doc-name">No tax lines detected</div>`;
 		}
 		let html = d.tax_template
-			? `<div style="font-size:0.85em;margin-bottom:6px">
-				<span style="background:#f0fdf4;border:1px solid #bbf7d0;padding:4px 10px;border-radius:4px">
-					${frappe.utils.escape_html(d.tax_template)} → <strong>${frappe.format(d.tax_amount, { fieldtype: "Currency", currency: d.currency })}</strong>
-				</span>
+			? `<div class="aiv-tax-chip">
+				${frappe.utils.escape_html(d.tax_template)} → <strong>${frappe.format(d.tax_amount, { fieldtype: "Currency", currency: d.currency })}</strong>
 			   </div>`
-			: `<div style="font-size:0.85em;color:#374151">Total tax: <strong>${frappe.format(d.tax_amount, { fieldtype: "Currency", currency: d.currency })}</strong></div>`;
-		html += `<div style="font-size:0.78em;color:#94a3b8;margin-top:4px">Mapped to tax template on the generated invoice</div>`;
+			: `<div style="font-size:0.85em">Total tax: <strong>${frappe.format(d.tax_amount, { fieldtype: "Currency", currency: d.currency })}</strong></div>`;
+		html += `<div style="font-size:0.78em" class="aiv-doc-name">Mapped to tax template on the generated invoice</div>`;
 		return html;
 	}
 
 	_status_badge(status) {
-		const map = {
-			"Draft":               { bg: "#f1f5f9", color: "#475569" },
-			"Extracting":          { bg: "#dbeafe", color: "#1e40af" },
-			"Pending Validation":  { bg: "#fef3c7", color: "#92400e" },
-			"Submitted":           { bg: "#dcfce7", color: "#166534" },
-			"Failed":              { bg: "#fee2e2", color: "#991b1b" },
-		};
-		const s = map[status] || { bg: "#f1f5f9", color: "#374151" };
-		return `<span style="background:${s.bg};color:${s.color};padding:4px 12px;border-radius:4px;font-size:0.82em;font-weight:600">${status}</span>`;
+		const cls = {
+			"Draft":               "aiv-badge-draft",
+			"Extracting":          "aiv-badge-extracting",
+			"Pending Validation":  "aiv-badge-pending",
+			"Potential Duplicate": "aiv-badge-duplicate",
+			"Submitted":           "aiv-badge-submitted",
+			"Failed":              "aiv-badge-failed",
+		}[status] || "aiv-badge-draft";
+		return `<span class="aiv-badge ${cls}">${status}</span>`;
 	}
 
 	_bind_events() {
@@ -353,8 +494,9 @@ class AiValidatePage {
 					const results = r.message || [];
 					if (!results.length) { suggestions.hide(); return; }
 					suggestions.html(results.map((row) =>
-						`<div class="ai-match-option" data-fieldname="${fieldname}" data-value="${frappe.utils.escape_html(row.value)}"
-							style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f1f5f9;color:#374151">
+						`<div class="aiv-suggestion-item ai-match-option"
+							data-fieldname="${fieldname}"
+							data-value="${frappe.utils.escape_html(row.value)}">
 							${frappe.utils.escape_html(row.value)}
 						</div>`
 					).join("")).show();
@@ -405,10 +547,11 @@ class AiValidatePage {
 				const results = r.message || [];
 				if (!results.length) { sug.hide(); return; }
 				sug.html(results.map((row) =>
-					`<div class="ai-item-option" data-row="${frappe.utils.escape_html(row_name)}" data-value="${frappe.utils.escape_html(row.value)}"
-						style="padding:6px 10px;cursor:pointer;border-bottom:1px solid #f1f5f9;color:#374151">
+					`<div class="aiv-item-option ai-item-option"
+						data-row="${frappe.utils.escape_html(row_name)}"
+						data-value="${frappe.utils.escape_html(row.value)}">
 						${frappe.utils.escape_html(row.value)}
-						${row.description ? `<span style="color:#94a3b8;font-size:0.85em;margin-left:4px">${frappe.utils.escape_html(row.description)}</span>` : ""}
+						${row.description ? `<span class="aiv-pill-score"> — ${frappe.utils.escape_html(row.description)}</span>` : ""}
 					</div>`
 				).join("")).show();
 			});
@@ -433,6 +576,13 @@ class AiValidatePage {
 				root.find(`.ai-item-suggestions[data-row="${row_name}"]`).hide();
 				this._save_item_field(row_name, "item_code", e.target.value.trim());
 			}
+		});
+
+		root.on("click", ".ai-create-item-btn", (e) => {
+			const btn = $(e.currentTarget);
+			const row_name = String(btn.data("row"));
+			const desc = String(btn.data("desc") || "");
+			this._open_create_item_dialog(row_name, desc);
 		});
 
 		root.find("#ai-submit-btn").on("click", () => this._submit());
@@ -499,10 +649,10 @@ class AiValidatePage {
 		const low_threshold = s.supplier_low_confidence || 60;
 		const supplier_score = mp.current_supplier_score != null ? mp.current_supplier_score : (d.supplier_match_score || 0);
 		const unmapped_count = (d.items || []).filter(i => !i.item_code).length;
-		const can_submit = d.status === "Pending Validation" && (mp.current_supplier || d.supplier) && supplier_score >= low_threshold && unmapped_count === 0;
+		const can_submit = ["Pending Validation", "Potential Duplicate"].includes(d.status) && (mp.current_supplier || d.supplier) && supplier_score >= low_threshold && unmapped_count === 0;
 
 		const btn = $(this.wrapper).find("#ai-submit-btn");
-		btn.css({ background: can_submit ? "#4f46e5" : "#94a3b8", cursor: can_submit ? "pointer" : "not-allowed" });
+		btn.css({ background: can_submit ? "var(--blue, #0B70E1)" : "var(--text-muted, #9BB5CC)", cursor: can_submit ? "pointer" : "not-allowed" });
 		btn.prop("disabled", !can_submit);
 
 		const warn = $(this.wrapper).find("#ai-submit-warning");
@@ -570,5 +720,146 @@ class AiValidatePage {
 				});
 			}
 		);
+	}
+
+	_check_duplicates() {
+		const d = this.doc;
+		if (!d) return;
+		const supplier = d.supplier;
+		const inv_no   = d.invoice_number;
+		if (!supplier && !inv_no) return;
+
+		const checks = [];
+
+		// 1. Existing Purchase Invoices with same bill_no + supplier
+		if (inv_no && supplier) {
+			checks.push(frappe.call({
+				method: "frappe.client.get_list",
+				args: {
+					doctype: "Purchase Invoice",
+					filters: { bill_no: inv_no, supplier, docstatus: ["!=", 2] },
+					fields: ["name", "docstatus", "grand_total"],
+					limit: 5,
+				},
+			}));
+		} else {
+			checks.push(Promise.resolve({ message: [] }));
+		}
+
+		// 2. Other AI Document Imports already Submitted for same supplier + invoice number
+		if (inv_no && supplier) {
+			checks.push(frappe.call({
+				method: "frappe.client.get_list",
+				args: {
+					doctype: "AI Document Import",
+					filters: {
+						invoice_number: inv_no,
+						supplier,
+						status: "Submitted",
+						name: ["!=", this.name],
+					},
+					fields: ["name", "purchase_invoice"],
+					limit: 5,
+				},
+			}));
+		} else {
+			checks.push(Promise.resolve({ message: [] }));
+		}
+
+		Promise.all(checks).then(([pi_r, ai_r]) => {
+			const pis = pi_r.message || [];
+			const ais = ai_r.message || [];
+			if (!pis.length && !ais.length) return;
+
+			const lines = [];
+			if (pis.length) {
+				const links = pis.map(p => {
+					const url = frappe.utils.get_form_link("Purchase Invoice", p.name);
+					const label = p.docstatus === 1 ? "submitted" : "draft";
+					return `<a href="${url}" target="_blank">${frappe.utils.escape_html(p.name)}</a> (${label})`;
+				}).join(", ");
+				lines.push(`Purchase Invoice already exists for supplier <strong>${frappe.utils.escape_html(supplier)}</strong> with invoice # <strong>${frappe.utils.escape_html(inv_no)}</strong>: ${links}`);
+			}
+			if (ais.length) {
+				const links = ais.map(a => {
+					const url = `/app/ai-invoice-validate/${encodeURIComponent(a.name)}`;
+					const pi = a.purchase_invoice ? ` → ${frappe.utils.escape_html(a.purchase_invoice)}` : "";
+					return `<a href="${url}" target="_blank">${frappe.utils.escape_html(a.name)}${pi}</a>`;
+				}).join(", ");
+				lines.push(`Already imported via: ${links}`);
+			}
+
+			const banner = `
+				<div class="aiv-dup-banner" id="aiv-dup-banner">
+					<span class="aiv-dup-icon">⚠</span>
+					<div class="aiv-dup-links">
+						<strong>Duplicate detected</strong><br>
+						${lines.join("<br>")}
+					</div>
+				</div>`;
+
+			$(this.wrapper).find("#ai-validate-root").prepend(banner);
+		});
+	}
+
+	_open_create_item_dialog(row_name, ai_description) {
+		const dialog = new frappe.ui.Dialog({
+			title: "Create New Item",
+			fields: [
+				{
+					fieldname: "template_item",
+					label: "Start from existing item (optional)",
+					fieldtype: "Link",
+					options: "Item",
+					description: "Load an existing item as a template — fields below will be pre-filled",
+					change() {
+						const tpl = this.get_value();
+						if (!tpl) return;
+						frappe.call({
+							method: "frappe.client.get",
+							args: { doctype: "Item", name: tpl, fieldname: ["item_name", "item_group", "stock_uom", "description"] },
+						}).then((r) => {
+							if (!r.message) return;
+							const m = r.message;
+							dialog.set_value("item_name",   m.item_name   || "");
+							dialog.set_value("item_group",  m.item_group  || "");
+							dialog.set_value("stock_uom",   m.stock_uom   || "");
+							dialog.set_value("description", m.description || "");
+						});
+					},
+				},
+				{ fieldname: "sec1", fieldtype: "Section Break" },
+				{ fieldname: "item_code",  label: "Item Code",       fieldtype: "Data",      reqd: 1, default: ai_description.slice(0, 140) },
+				{ fieldname: "item_name",  label: "Item Name",       fieldtype: "Data",      reqd: 1, default: ai_description.slice(0, 140) },
+				{ fieldname: "item_group", label: "Item Group",      fieldtype: "Link",      options: "Item Group", reqd: 1 },
+				{ fieldname: "stock_uom",  label: "Unit of Measure", fieldtype: "Link",      options: "UOM", default: "Nos", reqd: 1 },
+				{ fieldname: "description", label: "Description",    fieldtype: "Small Text", default: ai_description },
+			],
+			primary_action_label: "Create & Link",
+			primary_action: (values) => {
+				frappe.call({
+					method: "frappe.client.insert",
+					args: {
+						doc: {
+							doctype: "Item",
+							item_code: values.item_code,
+							item_name: values.item_name,
+							item_group: values.item_group,
+							stock_uom: values.stock_uom,
+							description: values.description || "",
+							is_purchase_item: 1,
+						},
+					},
+				}).then((r) => {
+					if (!r.message || !r.message.name) return;
+					const new_code = r.message.name;
+					dialog.hide();
+					frappe.show_alert({ message: `Item ${new_code} created`, indicator: "green" }, 3);
+					$(this.wrapper).find(`.ai-item-input[data-row="${row_name}"]`).val(new_code);
+					this._save_item_field(row_name, "item_code", new_code);
+				});
+			},
+		});
+		dialog.show();
 	}
 }

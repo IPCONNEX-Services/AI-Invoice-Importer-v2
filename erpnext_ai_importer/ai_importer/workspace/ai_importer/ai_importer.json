@@ -32,18 +32,6 @@
  "sequence_id": 99,
  "shortcuts": [
   {
-   "color": "Blue",
-   "doc_view": "",
-   "doctype": "Page",
-   "format": "",
-   "icon": "upload",
-   "label": "Supplier Invoice Importer",
-   "link_to": "ai-invoice-importer",
-   "name": "Supplier Invoice Importer",
-   "stats_filter": "",
-   "type": "Page"
-  },
-  {
    "color": "Green",
    "doc_view": "",
    "doctype": "DocType",

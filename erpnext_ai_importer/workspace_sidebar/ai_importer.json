@@ -1,0 +1,60 @@
+{
+ "app": "erpnext_ai_importer",
+ "doctype": "Workspace Sidebar",
+ "for_user": "",
+ "header_icon": "upload",
+ "module": "Ai Importer",
+ "name": "AI Importer",
+ "standard": 1,
+ "title": "AI Importer",
+ "items": [
+  {
+   "child": 0,
+   "collapsible": 0,
+   "icon": "home",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Importer",
+   "link_to": "AI Importer",
+   "link_type": "Workspace",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 0,
+   "icon": "list",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "All Imports",
+   "link_to": "AI Document Import",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 0,
+   "icon": "settings",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Settings",
+   "link_to": "AI Import Settings",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 0,
+   "icon": "edit",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Import Log",
+   "link_to": "AI Import Log",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ]
+}
