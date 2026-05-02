@@ -1,7 +1,13 @@
 {
  "category": "Modules",
  "charts": [],
- "content": "[{\"id\": \"s1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Supplier Invoice Importer\", \"col\": 3}}, {\"id\": \"s2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"AI Invoice Import\", \"col\": 3}}, {\"id\": \"s3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"AI Import Settings\", \"col\": 3}}]",
+ "content": "[{\"id\": \"b1\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"AI Invoice Importer\", \"col\": 12}}]",
+ "custom_blocks": [
+  {
+   "custom_block_name": "ai-invoice-importer",
+   "label": "AI Invoice Importer"
+  }
+ ],
  "creation": "2026-04-18 00:00:00.000000",
  "developer_mode_only": 0,
  "disable_user_customization": 0,
@@ -15,9 +21,14 @@
  "module": "Ai Importer",
  "name": "AI Importer",
  "onboarding": "",
- "parent_page": "Accounting",
+ "parent_page": "",
  "public": 1,
- "roles": [{"role": "System Manager"}],
+ "roles": [
+  {"role": "Accounts Manager"},
+  {"role": "Purchase User"},
+  {"role": "Sales User"},
+  {"role": "System Manager"}
+ ],
  "sequence_id": 99,
  "shortcuts": [
   {

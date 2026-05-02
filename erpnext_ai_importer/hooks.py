@@ -14,5 +14,5 @@ doctype_js = {
 
 fixtures = [
     {"doctype": "Workspace", "filters": [["module", "=", "Ai Importer"]]},
-    {"doctype": "Page", "filters": [["module", "=", "Ai Importer"]]},
+    {"doctype": "Custom HTML Block", "filters": [["name", "in", ["ai-invoice-importer"]]]},
 ]
