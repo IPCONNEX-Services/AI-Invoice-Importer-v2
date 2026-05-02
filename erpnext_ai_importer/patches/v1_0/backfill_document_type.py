@@ -8,13 +8,14 @@ def execute():
     behave identically to before the rename.
     Idempotent — WHERE clause skips already-backfilled rows.
     """
+    # MariaDB applies column DEFAULTs to existing rows during ALTER TABLE ADD COLUMN,
+    # so document_type and source are already populated before this patch runs.
+    # Gate on party_type (no default) to correctly target un-backfilled rows.
     frappe.db.sql("""
         UPDATE `tabAI Document Import`
         SET
-            document_type = 'Purchase Invoice',
-            party_type    = 'Supplier',
-            party         = supplier,
-            source        = 'Manual Upload'
-        WHERE document_type IS NULL OR document_type = ''
+            party_type = 'Supplier',
+            party      = supplier
+        WHERE party_type IS NULL AND supplier IS NOT NULL
     """)
     frappe.db.commit()
