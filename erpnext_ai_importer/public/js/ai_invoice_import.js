@@ -21,7 +21,7 @@ function _render_supplier_confidence(frm) {
     const score = frm.doc.supplier_match_score || 0;
     const color = score >= 85 ? "#16a34a" : score >= 60 ? "#d97706" : "#dc2626";
     const msg = `<span style="color:${color}">Match: <b>${score}%</b> — AI extracted: "<i>${frm.doc.extracted_supplier_name}</i>"</span>`;
-    frm.get_field("supplier").set_description(msg);
+    frm.get_field("party").set_description(msg);
 }
 
 function _highlight_low_confidence_items(frm) {
@@ -78,7 +78,7 @@ function _add_action_buttons(frm) {
 
 function _submit(frm) {
     const score = frm.doc.supplier_match_score || 0;
-    if (!frm.doc.supplier) {
+    if (!frm.doc.party) {
         frappe.msgprint({ title: "Missing Supplier", message: "Please select a supplier before submitting.", indicator: "red" });
         return;
     }
@@ -102,7 +102,7 @@ function _submit(frm) {
 
     const total = format_currency(frm.doc.total, frm.doc.currency);
     frappe.confirm(
-        `Create Purchase Invoice for <b>${frm.doc.supplier}</b>?<br>Total: <b>${total}</b>`,
+        `Create Purchase Invoice for <b>${frm.doc.party}</b>?<br>Total: <b>${total}</b>`,
         () => {
             frappe.call({
                 method: "erpnext_ai_importer.api.submit.create_purchase_invoice",

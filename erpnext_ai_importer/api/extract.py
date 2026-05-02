@@ -64,6 +64,8 @@ def run_extraction(import_name):
         supplier, score = match_supplier(extracted_name, threshold=0)
         doc.supplier = supplier
         doc.supplier_match_score = score
+        doc.party_type = "Supplier"
+        doc.party = supplier
 
         doc.items = []
         for li in (result.get("line_items") or []):
