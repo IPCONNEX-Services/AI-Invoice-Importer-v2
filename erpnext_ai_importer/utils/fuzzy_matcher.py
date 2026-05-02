@@ -32,6 +32,14 @@ def _fuzzy_top_matches_from_choices(name, choices, limit=5, threshold=0):
     return sorted(out, key=lambda x: x["score"], reverse=True)
 
 
+def match_company(name, threshold=0):
+    """Return (company_docname, score). Matches extracted company name against Frappe Company list."""
+    import frappe
+    companies = frappe.get_all("Company", fields=["name", "company_name"], filters={"is_group": 0})
+    choices = {c.name: c.company_name for c in companies}
+    return _fuzzy_match_from_choices(name, choices, threshold)
+
+
 def match_supplier(name, threshold=0):
     """Return (supplier_docname, score). Queries live ERPNext Supplier table."""
     import frappe

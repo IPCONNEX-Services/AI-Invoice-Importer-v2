@@ -1,18 +1,22 @@
 import json
 
-EXTRACTION_PROMPT = """You are processing a purchase invoice received by our company.
-Extract data from the invoice text below and return ONLY valid JSON matching exactly this schema.
+EXTRACTION_PROMPT = """You are processing a document (invoice, quote, order, or payment notice).
+Extract data from the text below and return ONLY valid JSON matching exactly this schema.
 Use null for any field you cannot determine.
 
-IMPORTANT for supplier_name: extract the name of the company that ISSUED this invoice
-(the vendor/seller we owe money to). Do NOT return our own company name or the bill-to address.
+IMPORTANT:
+- our_company: the company that RECEIVED or ISSUED this document on our side
+  (look for "Bill To", "Sold To", "Ship To", or the recipient header — this is one of our companies).
+- supplier_name: the external vendor/seller who sent this document
+  (the "From" / issuer — NOT our company, NOT the bill-to address).
 
 {
+  "our_company": "Full legal name of the company on our side (recipient/buyer for invoices, issuer/seller for sales docs)",
   "invoice_number": "string or null",
   "invoice_date": "YYYY-MM-DD string or null",
   "due_date": "YYYY-MM-DD string or null",
   "currency": "3-letter ISO code or null",
-  "supplier_name": "Name of the vendor/seller who sent this invoice (not the buyer/recipient)",
+  "supplier_name": "Name of the external vendor/seller who issued this document (not our company)",
   "subtotal": "number or null",
   "tax_lines": [{"name": "string", "rate": "number", "amount": "number"}],
   "total": "number or null",

@@ -2,7 +2,7 @@ import json
 import frappe
 from erpnext_ai_importer.utils.pdf_extractor import extract_text_with_fallback
 from erpnext_ai_importer.utils.ai_client import extract_invoice_data
-from erpnext_ai_importer.utils.fuzzy_matcher import match_supplier, best_item_match
+from erpnext_ai_importer.utils.fuzzy_matcher import match_company, match_supplier, best_item_match
 
 
 def run_extraction(import_name):
@@ -58,6 +58,12 @@ def run_extraction(import_name):
 
         tax_lines = result.get("tax_lines") or []
         doc.tax_amount = sum(float(t.get("amount") or 0) for t in tax_lines)
+
+        extracted_company = result.get("our_company") or ""
+        if extracted_company:
+            company_match, company_score = match_company(extracted_company, threshold=60)
+            if company_match:
+                doc.company = company_match
 
         extracted_name = result.get("supplier_name") or ""
         doc.extracted_supplier_name = extracted_name

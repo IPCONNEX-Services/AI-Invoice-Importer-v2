@@ -49,13 +49,14 @@ def _create_record(file_path, company, provider, scanned_mode):
     ftype = detect_file_type(file_path)
 
     doc = frappe.new_doc("AI Document Import")
-    doc.company = company or frappe.defaults.get_user_default("Company")
+    doc.company = company or ""
     doc.file_type = ftype
     doc.status = "Draft"
     if provider:
         doc.provider_used = provider
     if scanned_mode:
         doc.extraction_method = scanned_mode
+    doc.flags.ignore_mandatory = True
     doc.insert(ignore_permissions=True)
 
     with open(file_path, "rb") as f:
