@@ -103,7 +103,7 @@ class AiValidatePage {
 							Match Intelligence
 						</div>
 						<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
-							${this._match_block_html("company", "Our Company", mp.extracted_company, mp.company_matches || [], mp.current_company || d.company || "", null)}
+							${this._match_block_html("company", "Our Company", mp.extracted_company, mp.company_matches || [], mp.current_company || d.company || "", mp.current_company_score != null ? mp.current_company_score : null)}
 							${this._match_block_html("supplier", "Supplier / Party", mp.extracted_supplier, mp.supplier_matches || [], mp.current_supplier || d.supplier || "", supplier_score)}
 						</div>
 					</div>

@@ -17,6 +17,7 @@ def run_extraction(import_name):
 
     try:
         doc.status = "Extracting"
+        doc.flags.ignore_mandatory = True
         doc.save(ignore_permissions=True)
         frappe.db.commit()
 
@@ -96,6 +97,7 @@ def run_extraction(import_name):
         frappe.log_error(doc.error_message, f"AI Document Import extraction failed: {import_name}")
 
     finally:
+        doc.flags.ignore_mandatory = True
         doc.save(ignore_permissions=True)
         frappe.db.commit()
 

@@ -26,10 +26,19 @@ def get_match_preview(import_name):
     suppliers = frappe.get_all("Supplier", fields=["name", "supplier_name"], filters={"disabled": 0})
     supplier_choices = {s.name: s.supplier_name for s in suppliers}
 
-    c_top = (process.extract(extracted_company, company_choices, scorer=fuzz.WRatio, limit=4, score_cutoff=0)
-             if extracted_company else [])
+    # Use current company as lookup text when AI didn't extract one yet
+    company_lookup = extracted_company or doc.company or ""
+    c_top = (process.extract(company_lookup, company_choices, scorer=fuzz.WRatio, limit=4, score_cutoff=0)
+             if company_lookup else [])
     s_top = (process.extract(extracted_supplier, supplier_choices, scorer=fuzz.WRatio, limit=4, score_cutoff=0)
              if extracted_supplier else [])
+
+    # Score for the currently saved company value
+    current_company_score = 0
+    if doc.company and company_choices:
+        m = process.extractOne(doc.company, company_choices, scorer=fuzz.WRatio, score_cutoff=0)
+        if m:
+            current_company_score = round(m[1])
 
     return {
         "extracted_company": extracted_company,
@@ -39,4 +48,5 @@ def get_match_preview(import_name):
         "current_company": doc.company or "",
         "current_supplier": doc.supplier or "",
         "current_supplier_score": doc.supplier_match_score or 0,
+        "current_company_score": current_company_score,
     }
