@@ -2,21 +2,22 @@ import json
 import frappe
 from erpnext_ai_importer.utils.pdf_extractor import extract_text_with_fallback
 from erpnext_ai_importer.utils.ai_client import extract_invoice_data
-from erpnext_ai_importer.utils.fuzzy_matcher import match_supplier, best_item_match
+from erpnext_ai_importer.utils.fuzzy_matcher import match_company, match_supplier, best_item_match
 
 
 def run_extraction(import_name):
     """
-    Background job. Runs the full extraction pipeline for one AI Invoice Import record.
+    Background job. Runs the full extraction pipeline for one AI Document Import record.
     Called via frappe.enqueue — not a whitelist method.
     """
-    doc = frappe.get_doc("AI Invoice Import", import_name)
+    doc = frappe.get_doc("AI Document Import", import_name)
     settings = frappe.get_single("AI Import Settings")
     success = 0
     tokens_used = 0
 
     try:
         doc.status = "Extracting"
+        doc.flags.ignore_mandatory = True
         doc.save(ignore_permissions=True)
         frappe.db.commit()
 
@@ -59,11 +60,20 @@ def run_extraction(import_name):
         tax_lines = result.get("tax_lines") or []
         doc.tax_amount = sum(float(t.get("amount") or 0) for t in tax_lines)
 
+        extracted_company = result.get("our_company") or ""
+        if extracted_company:
+            company_match, company_score = match_company(extracted_company, threshold=60)
+            if company_match:
+                doc.company = company_match
+
         extracted_name = result.get("supplier_name") or ""
         doc.extracted_supplier_name = extracted_name
         supplier, score = match_supplier(extracted_name, threshold=0)
         doc.supplier = supplier
         doc.supplier_match_score = score
+        doc.party_type = "Supplier"
+        doc.party = supplier
+        doc.is_telecom_invoice = 1 if (supplier and frappe.db.exists("Telecom Partner", {"supplier": supplier})) else 0
 
         doc.items = []
         for li in (result.get("line_items") or []):
@@ -78,16 +88,17 @@ def run_extraction(import_name):
                 "amount": float(li.get("amount") or 0),
             })
 
-        doc.status = "Pending Validation"
+        doc.status = _check_duplicate_status(doc, import_name)
         doc.error_message = ""
         success = 1
 
     except Exception:
         doc.status = "Failed"
         doc.error_message = frappe.get_traceback()
-        frappe.log_error(doc.error_message, f"AI Invoice Import extraction failed: {import_name}")
+        frappe.log_error(doc.error_message, f"AI Document Import extraction failed: {import_name}")
 
     finally:
+        doc.flags.ignore_mandatory = True
         doc.save(ignore_permissions=True)
         frappe.db.commit()
 
@@ -118,6 +129,25 @@ def reextract(import_name):
         import_name=import_name,
     )
     return "Queued"
+
+
+def _check_duplicate_status(doc, import_name):
+    inv_no = doc.invoice_number
+    supplier = doc.supplier
+    if not inv_no or not supplier:
+        return "Pending Validation"
+    existing_pi = frappe.db.exists("Purchase Invoice", {
+        "bill_no": inv_no, "supplier": supplier, "docstatus": ["!=", 2],
+    })
+    if existing_pi:
+        return "Potential Duplicate"
+    existing_import = frappe.db.get_value("AI Document Import", {
+        "invoice_number": inv_no, "supplier": supplier,
+        "status": "Submitted", "name": ["!=", import_name],
+    }, "name")
+    if existing_import:
+        return "Potential Duplicate"
+    return "Pending Validation"
 
 
 def _resolve_model(settings, provider):

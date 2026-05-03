@@ -1,5 +1,5 @@
 from frappe.model.document import Document
 
 
-class AIInvoiceImportItem(Document):
+class AIDocumentImportItem(Document):
     pass

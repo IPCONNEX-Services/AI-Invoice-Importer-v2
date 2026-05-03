@@ -5,17 +5,17 @@ from erpnext_ai_importer.utils.invoice_builder import build_purchase_invoice
 @frappe.whitelist()
 def create_purchase_invoice(import_name):
     """
-    Validates the AI Invoice Import record and creates a Purchase Invoice.
+    Validates the AI Document Import record and creates a Purchase Invoice.
     Called from the form JS after user confirmation.
     Returns the new Purchase Invoice name.
     """
-    doc = frappe.get_doc("AI Invoice Import", import_name)
+    doc = frappe.get_doc("AI Document Import", import_name)
 
     if doc.status == "Submitted":
         frappe.throw("This import has already been submitted.")
 
-    if doc.status != "Pending Validation":
-        frappe.throw(f"Cannot submit an import with status '{doc.status}'. It must be 'Pending Validation'.")
+    if doc.status not in ("Pending Validation", "Potential Duplicate"):
+        frappe.throw(f"Cannot submit an import with status '{doc.status}'. It must be 'Pending Validation' or 'Potential Duplicate'.")
 
     if not doc.supplier:
         frappe.throw("Supplier is required before creating an invoice.")
