@@ -1,0 +1,14 @@
+{
+ "doctype": "Page",
+ "module": "Ai Importer",
+ "name": "telecom-invoice-match",
+ "page_name": "telecom-invoice-match",
+ "standard": "Yes",
+ "system_page": 0,
+ "title": "Telecom Invoice Match",
+ "roles": [
+  {"role": "Accounts Manager"},
+  {"role": "Purchase User"},
+  {"role": "System Manager"}
+ ]
+}

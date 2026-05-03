@@ -73,6 +73,7 @@ def run_extraction(import_name):
         doc.supplier_match_score = score
         doc.party_type = "Supplier"
         doc.party = supplier
+        doc.is_telecom_invoice = 1 if (supplier and frappe.db.exists("Telecom Partner", {"supplier": supplier})) else 0
 
         doc.items = []
         for li in (result.get("line_items") or []):

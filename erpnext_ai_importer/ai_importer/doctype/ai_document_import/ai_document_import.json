@@ -23,6 +23,7 @@
   "extracted_supplier_name",
   "supplier",
   "supplier_match_score",
+  "is_telecom_invoice",
   "section_invoice",
   "invoice_number",
   "invoice_date",
@@ -37,6 +38,7 @@
   "items",
   "section_result",
   "purchase_invoice",
+  "ixc_anchor_pi",
   "target_docname",
   "section_debug",
   "raw_ai_response",
@@ -260,6 +262,22 @@
    "fieldname": "error_message",
    "fieldtype": "Text",
    "label": "Error Message",
+   "read_only": 1
+  },
+  {
+   "fieldname": "is_telecom_invoice",
+   "fieldtype": "Check",
+   "label": "Telecom Invoice",
+   "description": "Auto-set when the supplier is a registered Telecom Partner. Enables IXC bilateral matching before submission.",
+   "read_only": 1,
+   "in_list_view": 0
+  },
+  {
+   "fieldname": "ixc_anchor_pi",
+   "fieldtype": "Link",
+   "label": "IXC Bilateral Anchor PI",
+   "options": "Purchase Invoice",
+   "description": "The IXC-imported draft Purchase Invoice this import is matched against.",
    "read_only": 1
   }
  ],

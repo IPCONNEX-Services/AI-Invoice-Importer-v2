@@ -17,7 +17,7 @@ frappe.pages["ai-invoice-validate"].on_page_load = function (wrapper) {
 			--r-sm:6px; --r-md:10px; --r-lg:14px;
 			--sh-sm:0 1px 4px rgba(11,29,58,.07);
 			--sh-md:0 4px 16px rgba(11,29,58,.10);
-			max-width:none; margin:0; padding:20px 16px 60px;
+			max-width:1100px; margin:0 auto; padding:20px 16px 60px;
 			font-family:'Inter','Segoe UI',-apple-system,sans-serif;
 		}
 		.aiv-header {
@@ -326,9 +326,14 @@ class AiValidatePage {
 					<!-- Action bar -->
 					<div class="aiv-action-bar">
 						${["Pending Validation", "Potential Duplicate"].includes(d.status) ? `
+							${d.is_telecom_invoice ? `
+							<a href="/app/telecom-invoice-match?import=${encodeURIComponent(d.name)}"
+								class="aiv-btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
+								⇄ Match with IXC Billing
+							</a>` : `
 							<button id="ai-submit-btn" class="aiv-btn-primary" ${can_submit ? "" : "disabled"}>
 								✓ Create Purchase Invoice
-							</button>
+							</button>`}
 							<button id="ai-reextract-btn" class="aiv-btn-secondary">↺ Re-extract</button>
 						` : ""}
 						${d.status === "Draft" ? `

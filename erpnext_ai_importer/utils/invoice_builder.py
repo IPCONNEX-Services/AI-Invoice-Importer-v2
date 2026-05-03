@@ -13,6 +13,8 @@ def build_purchase_invoice(import_doc):
     pi.company = import_doc.company
     pi.bill_no = import_doc.invoice_number
     pi.bill_date = import_doc.invoice_date or frappe.utils.today()
+    pi.posting_date = import_doc.invoice_date or frappe.utils.today()
+    pi.set_posting_time = 1
     pi.due_date = import_doc.due_date
     pi.currency = import_doc.currency or frappe.defaults.get_global_default("currency")
 
@@ -36,8 +38,19 @@ def build_purchase_invoice(import_doc):
         })
 
     pi.set_missing_values()
+    # Re-apply dates after set_missing_values() which resets posting_date to today
+    invoice_date = import_doc.invoice_date or frappe.utils.today()
+    pi.posting_date = invoice_date
+    pi.bill_date = invoice_date
     pi.insert(ignore_permissions=True)
     pi.submit()
+    # ERPNext validate() during submit can reset posting_date to today; force it back.
+    frappe.db.set_value("Purchase Invoice", pi.name, "posting_date", invoice_date, update_modified=False)
+    frappe.db.sql(
+        "UPDATE `tabGL Entry` SET posting_date=%s"
+        " WHERE voucher_type='Purchase Invoice' AND voucher_no=%s",
+        (invoice_date, pi.name),
+    )
 
     if import_doc.source_file:
         file_docs = frappe.get_all("File", filters={"file_url": import_doc.source_file}, fields=["name"])
