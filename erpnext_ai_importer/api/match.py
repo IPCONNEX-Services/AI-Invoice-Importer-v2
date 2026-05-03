@@ -85,12 +85,14 @@ def debug_bills_page():
         print(row.prettify()[:3000])
 
 
-def _apply_ixc_bill(host, bill_id, comment, ixc_amount):
+def _apply_ixc_bill(host, bill_id, comment, ai_amount):
     """
-    Apply an IXC /bills entry by replicating what the browser does:
-      1. Visit /bills (warm session + extract any authenticity_token for this bill)
-      2. GET /bills/apply with id, new_comment, new_amount (IXC's own amount)
-    Raises on failure so the caller can block PI creation.
+    Apply an IXC /bills entry using the imported (PDF) amount, then VERIFY the
+    apply took effect by re-fetching /bills. Raises on any failure so the caller
+    blocks PI creation.
+
+    Idempotent: if the bill is already applied (no form on /bills), this returns
+    successfully without re-applying.
     """
     from ipconnex_telecom.scripts.ixc_billing import _login
 
@@ -100,32 +102,40 @@ def _apply_ixc_bill(host, bill_id, comment, ixc_amount):
     if not sess:
         frappe.throw("IXC login failed — cannot apply the bill. Please try again.")
 
-    # Visit /bills — warms session and lets us extract the form's hidden tokens
-    r_bills = sess.get(
-        f"{host}/bills",
-        verify=False,
-        timeout=30,
-        headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                               "AppleWebKit/537.36 (KHTML, like Gecko) "
-                               "Chrome/124.0.0.0 Safari/537.36"},
-    )
+    UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+          "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
-    # Pull authenticity_token (Rails CSRF) from the specific bill's form
-    auth_token = None
-    soup = BeautifulSoup(r_bills.text, "html5lib")
-    for form in soup.find_all("form"):
-        id_input = form.find("input", {"name": "id"})
-        if id_input and id_input.get("value") == str(bill_id):
-            tok = form.find("input", {"name": "authenticity_token"})
-            if tok:
-                auth_token = tok.get("value")
-            break
+    def _bill_state():
+        """Return ('applied', None), ('unapplied', auth_token), or ('missing', None)."""
+        r = sess.get(f"{host}/bills", verify=False, timeout=30, headers={"User-Agent": UA})
+        soup = BeautifulSoup(r.text, "html5lib")
+        bill_present = any(
+            (a.get("href", "") or "").endswith(f"/bills/{bill_id}/edit")
+            for a in soup.find_all("a")
+        )
+        if not bill_present:
+            return ("missing", None)
+        for form in soup.find_all("form"):
+            id_input = form.find("input", {"name": "id"})
+            if id_input and id_input.get("value") == str(bill_id):
+                tok = form.find("input", {"name": "authenticity_token"})
+                return ("unapplied", tok.get("value") if tok else None)
+        return ("applied", None)
+
+    state, auth_token = _bill_state()
+    if state == "missing":
+        frappe.throw(
+            f"IXC bill {bill_id} is no longer on /bills — cannot apply. "
+            "The Purchase Invoice was NOT created."
+        )
+    if state == "applied":
+        return
 
     params = {
         "utf8":        "✓",
         "id":          str(bill_id),
         "new_comment": comment or "",
-        "new_amount":  f"{ixc_amount:.2f}",
+        "new_amount":  f"{ai_amount:.2f}",
     }
     if auth_token:
         params["authenticity_token"] = auth_token
@@ -133,21 +143,13 @@ def _apply_ixc_bill(host, bill_id, comment, ixc_amount):
     resp = sess.get(
         f"{host}/bills/apply",
         params=params,
-        headers={
-            "Referer": f"{host}/bills",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                          "AppleWebKit/537.36 (KHTML, like Gecko) "
-                          "Chrome/124.0.0.0 Safari/537.36",
-        },
-        verify=False,
-        timeout=30,
-        allow_redirects=True,
+        headers={"Referer": f"{host}/bills", "User-Agent": UA},
+        verify=False, timeout=30, allow_redirects=True,
     )
 
-    # Write debug trace so we can inspect what IXC actually returned
     try:
         with open("/tmp/ixc_apply_debug.txt", "w") as _f:
-            _f.write(f"bill_id={bill_id}  amount={ixc_amount:.2f}  auth_token={'yes' if auth_token else 'no'}\n")
+            _f.write(f"bill_id={bill_id}  amount={ai_amount:.2f}  auth_token={'yes' if auth_token else 'no'}\n")
             _f.write(f"final_url={resp.url}\n")
             _f.write(f"status={resp.status_code}\n\n")
             _f.write(resp.text[:4000])
@@ -157,7 +159,16 @@ def _apply_ixc_bill(host, bill_id, comment, ixc_amount):
     if resp.status_code not in (200, 302):
         frappe.throw(
             f"IXC apply returned HTTP {resp.status_code}. "
-            "The bill is still open — please try again."
+            "The Purchase Invoice was NOT created — please retry or apply manually on IXC."
+        )
+
+    # Verify the apply actually took effect — re-fetch /bills and confirm the
+    # form is no longer present for this bill_id
+    state_after, _ = _bill_state()
+    if state_after == "unapplied":
+        frappe.throw(
+            f"IXC apply did not take effect — bill {bill_id} still shows the apply form on /bills. "
+            "The Purchase Invoice was NOT created. Apply the bill manually on IXC, then retry."
         )
 
 
@@ -363,8 +374,8 @@ def submit_telecom_invoice(import_name, ixc_bill_id, override_note=None):
             "Refresh the page and try again."
         )
     host = frappe.conf.get("ixc_host", "https://sip-gw-2.ipconnex.net")
-    # Use IXC's own computed amount — IXC validates against its own records
-    _apply_ixc_bill(host, matched["bill_id"], matched.get("comment", ""), ixc_total)
+    # Use the imported (PDF) amount — this is what we're paying per the supplier invoice
+    _apply_ixc_bill(host, matched["bill_id"], matched.get("comment", ""), ai_total)
 
     # If the AI didn't extract an invoice date, use the IXC bill's date
     if not doc.invoice_date and matched.get("date"):
